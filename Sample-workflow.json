@@ -1,0 +1,83 @@
+{
+	"ownerApp": "oms",
+	"createTime": 0,
+	"updateTime": 0,
+	"createdBy": "admin",
+	"updatedBy": "admin",
+	"name": "oms.customer.1",
+	"description": "string",
+	"version": 1,
+	"tasks": [{
+			"name": "oms.address.decision",
+			"taskReferenceName": "oms.address.decision",
+			"inputParameters": {
+				"addressId": "${workflow.input.address.addressId}"
+			},
+			"type": "DECISION",
+			"caseValueParam": "addressId",
+			"caseExpression": "typeof $.addressId !=== 'undefined' ? 'Create Address' : 'Use Existed Address'",
+			"decisionCases": {
+				"Create Address": [{
+					"name": "address.create",
+					"taskReferenceName": "address.create",
+					"inputParameters": {
+						"address": "${workflow.input.address}"
+					},
+					"type": "SIMPLE",
+					"startDelay": 0
+				}],
+				"Use Existed Address": [{
+					"name": "address.get",
+					"taskReferenceName": "address.get",
+					"type": "SIMPLE",
+					"inputParameters": {
+						"address": "${workflow.input.address}"
+					},
+					"startDelay": 0
+				}]
+			},
+			"startDelay": 0
+		},
+		{
+			"name": "fleet.driver.request",
+			"taskReferenceName": "fleet.driver.request",
+			"description": "fleet.driver.request",
+			"inputParameters": {
+				"driverCount": "${workflow.input.driver}",
+				"skills": "${workflow.input.skills}",
+				"zone": "${workflow.input.zone}",
+				"orderId": "${workflow.input.order.orderId}",
+				"env": {
+					"taskId": "${CPEWF_TASK_ID}",
+					"workflowId": "${HOSTNAME}"
+				}
+			},
+			"type": "SIMPLE",
+			"startDelay": 0
+		},
+		{
+			"name": "tms.task.create",
+			"taskReferenceName": "tms.task.create",
+			"description": "tms.task.create",
+			"inputParameters": {
+				"order": "${workflow.input.order}",
+				"tasks": "${workflow.input.tasks}",
+				"isCreateTrip": "${workflow.input.isCreateTrip}"
+			},
+			"type": "SIMPLE"
+		},
+		{
+			"name": "oms.order.summarize",
+			"taskReferenceName": "oms.order.summarize",
+			"description": "oms.order.summarize",
+			"type": "SIMPLE"
+		}
+	],
+	"outputParameters": {
+		"order": "${oms.order.summarize.output.order}",
+		"fleet": "${oms.order.summarize.output.fleet}",
+		"tms": "${oms.order.summarize.output.tms}"
+	},
+	"restartable": false,
+	"schemaVersion": 1
+}

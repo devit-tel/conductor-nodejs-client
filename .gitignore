@@ -1,0 +1,6 @@
+build/
+node_modules/
+.env
+how
+dist/
+**/.DS_Store

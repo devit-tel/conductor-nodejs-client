@@ -1,0 +1,132 @@
+[
+  {
+    "ownerApp": "address",
+    "createTime": 0,
+    "updateTime": 0,
+    "createdBy": "admin",
+    "updatedBy": "admin",
+    "name": "address.create",
+    "description": "Address creation",
+    "retryCount": 0,
+    "timeoutSeconds": 0,
+    "inputKeys": [
+      "address"
+    ],
+    "outputKeys": [
+      "address"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 0,
+    "responseTimeoutSeconds": 180,
+    "concurrentExecLimit": 0,
+    "rateLimitPerFrequency": 0,
+    "rateLimitFrequencyInSeconds": 0,
+    "inputTemplate": {}
+  },
+  {
+    "ownerApp": "address",
+    "createTime": 0,
+    "updateTime": 0,
+    "createdBy": "admin",
+    "updatedBy": "admin",
+    "name": "address.get",
+    "description": "Address getting",
+    "retryCount": 0,
+    "timeoutSeconds": 0,
+    "inputKeys": [
+      "address"
+    ],
+    "outputKeys": [
+      "address"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 0,
+    "responseTimeoutSeconds": 180,
+    "concurrentExecLimit": 0,
+    "rateLimitPerFrequency": 0,
+    "rateLimitFrequencyInSeconds": 0,
+    "inputTemplate": {}
+  },
+  {
+    "ownerApp": "fleet",
+    "createTime": 0,
+    "updateTime": 0,
+    "createdBy": "admin",
+    "updatedBy": "admin",
+    "name": "fleet.driver.request",
+    "description": "Request driver",
+    "retryCount": 0,
+    "timeoutSeconds": 0,
+    "inputKeys": [
+      "driverCount",
+      "skills",
+      "zone",
+      "orderId",
+      "env"
+    ],
+    "outputKeys": [
+      "drivers"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 0,
+    "responseTimeoutSeconds": 180,
+    "concurrentExecLimit": 0,
+    "rateLimitPerFrequency": 0,
+    "rateLimitFrequencyInSeconds": 0,
+    "inputTemplate": {}
+  },
+  {
+    "ownerApp": "tms",
+    "createTime": 0,
+    "updateTime": 0,
+    "createdBy": "admin",
+    "updatedBy": "admin",
+    "name": "tms.task.create",
+    "description": "Create tasks",
+    "retryCount": 0,
+    "timeoutSeconds": 0,
+    "inputKeys": [
+      "order",
+      "tasks",
+      "isCreateTrip"
+    ],
+    "outputKeys": [
+      "tasks"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 0,
+    "responseTimeoutSeconds": 180,
+    "concurrentExecLimit": 0,
+    "rateLimitPerFrequency": 0,
+    "rateLimitFrequencyInSeconds": 0,
+    "inputTemplate": {}
+  },
+  {
+    "ownerApp": "oms",
+    "createTime": 0,
+    "updateTime": 0,
+    "createdBy": "admin",
+    "updatedBy": "admin",
+    "name": "oms.order.summarize",
+    "description": "Get order summary",
+    "retryCount": 0,
+    "timeoutSeconds": 0,
+    "inputKeys": [
+    ],
+    "outputKeys": [
+      "drivers"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 0,
+    "responseTimeoutSeconds": 180,
+    "concurrentExecLimit": 0,
+    "rateLimitPerFrequency": 0,
+    "rateLimitFrequencyInSeconds": 0,
+    "inputTemplate": {}
+  }
+]
