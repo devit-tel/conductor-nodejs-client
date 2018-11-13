@@ -1,11 +1,16 @@
 {
-  "parser"  : "babel-eslint",
-  "extends" : [
-    "standard"
-  ],
-  "plugins" : [
-    "babel"
-  ],
+  "parser": "babel-eslint",
+  "extends": ["standard", "prettier"],
+  "plugins": ["babel", "prettier"],
+  "rules": {
+    "prettier/prettier": ["error"],
+    "class-methods-use-this": "off",
+    "no-restricted-syntax": ["error", "WithStatement"],
+    "no-await-in-loop": "off",
+    "no-underscore-dangle": "off",
+    "no-shadow": "off",
+    "no-use-before-define": "off"
+  },
   "globals": {
     "Atomics": true,
     "SharedArrayBuffer": true,

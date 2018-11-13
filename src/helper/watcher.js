@@ -1,30 +1,41 @@
-import {pollForTask} from './connector'
+import { pollForTask } from './connector'
 
-const MESSAGE_TYPE = {
-  REGISTER_TASK: 'REGISTER_TASK'
+const DEFAULT_OPTIONS = {
+  pollingIntervals: 1000,
+  baseURL: 'http://localhost:8080/api'
 }
 
-function sleep (n) {
-  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, n)
-}
+export default class Watcher {
+  isPolling = false
 
-async function startPolling (baseURL, taskType, workerID) {
-  let {response} = await pollForTask(baseURL, taskType, workerID)
-  console.log(response.data)
-}
+  constructor(taskType, options, callback, errorCallback = f => f) {
+    if (!callback) throw new Error('Callback function is required')
+    this.taskType = taskType
+    this.options = { ...DEFAULT_OPTIONS, ...options }
+    this.callback = callback
+    this.errorCallback = errorCallback
+  }
 
-process.on('message', async function (message) {
-  console.log(message.options.baseURL)
-  if (message.type === MESSAGE_TYPE.REGISTER_TASK) {
-    const {options} = message
-    while (true) {
-      try {
-        await startPolling(options.baseURL, options.taskType, options.workerID)
-      } catch (e) {
-        console.error(e)
-        process.exit(1)
+  // this should be private function
+  polling = async () => {
+    this.startTime = new Date()
+    try {
+      const { baseURL, workerID } = this.options
+      const { data } = await pollForTask(baseURL, this.taskType, workerID)
+      if (data) {
+        this.callback(data)
       }
-      sleep(options.pollingTime * 1000)
+    } catch (error) {
+      this.errorCallback(error)
+    } finally {
+      setTimeout(this.polling, this.options.pollingIntervals - (new Date() - this.startTime))
     }
   }
-})
+
+  startPolling = () => {
+    if (this.isPolling) throw new Error('Watcher is already started')
+    this.isPolling = true
+    this.startTime = new Date()
+    this.polling()
+  }
+}

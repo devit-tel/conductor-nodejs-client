@@ -1,7 +1,7 @@
 {
-  "presets": ["env"],
-  "plugins": ["transform-object-rest-spread", ["transform-runtime", {
-    "polyfill": false,
-    "regenerator": true
-  }]]
+  "presets": ["@babel/preset-env"],
+  "plugins": [
+    "@babel/plugin-proposal-object-rest-spread",
+    "@babel/plugin-proposal-class-properties"
+  ]
 }

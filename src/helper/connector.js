@@ -1,4 +1,3 @@
-import url from 'url'
 import HTTPClient from 'axios'
 
 export const getWorkflowDefinition = (baseURL, workflowName, version = '1') =>
@@ -11,7 +10,7 @@ export const getWorkflowDefinition = (baseURL, workflowName, version = '1') =>
     }
   })
 
-export function createWorkflowDef (baseURL, workflowDefBody) {
+export function createWorkflowDef(baseURL, workflowDefBody) {
   return HTTPClient({
     method: 'post',
     baseURL,
@@ -20,7 +19,7 @@ export function createWorkflowDef (baseURL, workflowDefBody) {
   })
 }
 
-export function updateWorkflowDefs (baseURL, workflowDefsBody) {
+export function updateWorkflowDefs(baseURL, workflowDefsBody) {
   return HTTPClient({
     method: 'put',
     baseURL,
@@ -29,7 +28,7 @@ export function updateWorkflowDefs (baseURL, workflowDefsBody) {
   })
 }
 
-export function getAllWorkflowDefs (baseURL) {
+export function getAllWorkflowDefs(baseURL) {
   return HTTPClient({
     method: 'get',
     baseURL,
@@ -37,7 +36,7 @@ export function getAllWorkflowDefs (baseURL) {
   })
 }
 
-export function unRegisterWorkflowDef (baseURL, workflowDefName, version = '1') {
+export function unRegisterWorkflowDef(baseURL, workflowDefName, version = '1') {
   return HTTPClient({
     method: 'delete',
     baseURL,
@@ -48,7 +47,7 @@ export function unRegisterWorkflowDef (baseURL, workflowDefName, version = '1') 
   })
 }
 
-export function getTaskDef (baseURL, taskDefName) {
+export function getTaskDef(baseURL, taskDefName) {
   return HTTPClient({
     method: 'get',
     baseURL,
@@ -56,7 +55,7 @@ export function getTaskDef (baseURL, taskDefName) {
   })
 }
 
-export function registerTaskDefs (baseURL, taskDefsMeta) {
+export function registerTaskDefs(baseURL, taskDefsMeta) {
   return HTTPClient({
     method: 'post',
     baseURL,
@@ -65,7 +64,7 @@ export function registerTaskDefs (baseURL, taskDefsMeta) {
   })
 }
 
-export function updateTaskDef (baseURL, taskDefMeta) {
+export function updateTaskDef(baseURL, taskDefMeta) {
   return HTTPClient({
     method: 'put',
     baseURL,
@@ -74,7 +73,7 @@ export function updateTaskDef (baseURL, taskDefMeta) {
   })
 }
 
-export function unRegisterTaskDef (baseURL, taskDefName) {
+export function unRegisterTaskDef(baseURL, taskDefName) {
   return HTTPClient({
     method: 'delete',
     baseURL,
@@ -82,7 +81,7 @@ export function unRegisterTaskDef (baseURL, taskDefName) {
   })
 }
 
-export function getAllTaskDefs (baseURL) {
+export function getAllTaskDefs(baseURL) {
   return HTTPClient({
     method: 'get',
     baseURL,
@@ -94,7 +93,7 @@ export function getAllTaskDefs (baseURL) {
 /* Task Functions	  */
 /** ********************/
 
-export function getTask (baseURL, taskID) {
+export function getTask(baseURL, taskID) {
   return HTTPClient({
     method: 'get',
     baseURL,
@@ -102,7 +101,7 @@ export function getTask (baseURL, taskID) {
   })
 }
 
-export function updateTask (baseURL, taskBody) {
+export function updateTask(baseURL, taskBody) {
   return HTTPClient({
     method: 'get',
     baseURL,
@@ -111,7 +110,7 @@ export function updateTask (baseURL, taskBody) {
   })
 }
 
-export function pollForTask (baseURL, taskType, workerID) {
+export function pollForTask(baseURL, taskType, workerID) {
   return HTTPClient({
     method: 'get',
     baseURL,
@@ -122,7 +121,7 @@ export function pollForTask (baseURL, taskType, workerID) {
   })
 }
 
-export function ackTask (baseURL, taskType, workerID) {
+export function ackTask(baseURL, taskType, workerID) {
   return HTTPClient({
     method: 'post',
     baseURL,
@@ -136,7 +135,7 @@ export function ackTask (baseURL, taskType, workerID) {
   })
 }
 
-export function getAllTasksInQueue (baseURL) {
+export function getAllTasksInQueue(baseURL) {
   return HTTPClient({
     method: 'get',
     baseURL,
@@ -144,7 +143,7 @@ export function getAllTasksInQueue (baseURL) {
   })
 }
 
-export function removeTaskFromQueue (baseURL, taskType, taskID) {
+export function removeTaskFromQueue(baseURL, taskType, taskID) {
   return HTTPClient({
     method: 'delete',
     baseURL,
@@ -152,7 +151,7 @@ export function removeTaskFromQueue (baseURL, taskType, taskID) {
   })
 }
 
-export function getTaskQueueSizes (baseURL, taskNames) {
+export function getTaskQueueSizes(baseURL, taskNames) {
   return HTTPClient({
     method: 'post',
     baseURL,
@@ -165,7 +164,7 @@ export function getTaskQueueSizes (baseURL, taskNames) {
 /* Workflow Functions */
 /** ********************/
 
-export function getWorkflow (baseURL, workflowId, includeTasks) {
+export function getWorkflow(baseURL, workflowId, includeTasks) {
   return HTTPClient({
     method: 'get',
     baseURL,
@@ -176,13 +175,7 @@ export function getWorkflow (baseURL, workflowId, includeTasks) {
   })
 }
 
-export function getRunningWorkflows (
-  baseURL,
-  workflowName,
-  version = '1',
-  startTime,
-  endTime
-) {
+export function getRunningWorkflows(baseURL, workflowName, version = '1', startTime, endTime) {
   return HTTPClient({
     method: 'get',
     baseURL,
@@ -202,13 +195,7 @@ export function getRunningWorkflows (
   // }
 }
 
-export function startWorkflow (
-  baseURL,
-  workflowName,
-  version = '1',
-  correlationId,
-  inputJson = {}
-) {
+export function startWorkflow(baseURL, workflowName, version = '1', correlationId, inputJson = {}) {
   return HTTPClient({
     method: 'post',
     baseURL,
@@ -221,7 +208,7 @@ export function startWorkflow (
   })
 }
 
-export function terminateWorkflow (baseURL, workflowId, reason) {
+export function terminateWorkflow(baseURL, workflowId, reason) {
   return HTTPClient({
     method: 'delete',
     baseURL,
@@ -232,7 +219,7 @@ export function terminateWorkflow (baseURL, workflowId, reason) {
   })
 }
 
-export function pauseWorkflow (baseURL, workflowId) {
+export function pauseWorkflow(baseURL, workflowId) {
   return HTTPClient({
     method: 'put',
     baseURL,
@@ -240,7 +227,7 @@ export function pauseWorkflow (baseURL, workflowId) {
   })
 }
 
-export function resumeWorkflow (baseURL, workflowId) {
+export function resumeWorkflow(baseURL, workflowId) {
   return HTTPClient({
     method: 'put',
     baseURL,
@@ -248,12 +235,7 @@ export function resumeWorkflow (baseURL, workflowId) {
   })
 }
 
-export function skipTaskFromWorkflow (
-  baseURL,
-  workflowId,
-  taskReferenceName,
-  skipTaskRequestBody
-) {
+export function skipTaskFromWorkflow(baseURL, workflowId, taskReferenceName, skipTaskRequestBody) {
   return HTTPClient({
     method: 'put',
     baseURL,
@@ -262,7 +244,7 @@ export function skipTaskFromWorkflow (
   })
 }
 
-export function rerunWorkflow (baseURL, workflowId, rerunWorkflowRequest = {}) {
+export function rerunWorkflow(baseURL, workflowId, rerunWorkflowRequest = {}) {
   return HTTPClient({
     method: 'post',
     baseURL,
@@ -271,7 +253,7 @@ export function rerunWorkflow (baseURL, workflowId, rerunWorkflowRequest = {}) {
   })
 }
 
-export function restartWorkflow (baseURL, workflowId) {
+export function restartWorkflow(baseURL, workflowId) {
   return HTTPClient({
     method: 'post',
     baseURL,
