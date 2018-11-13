@@ -14,6 +14,7 @@ async function startPolling (baseURL, taskType, workerID) {
 }
 
 process.on('message', async function (message) {
+  console.log(message.options.baseURL)
   if (message.type === MESSAGE_TYPE.REGISTER_TASK) {
     const {options} = message
     while (true) {

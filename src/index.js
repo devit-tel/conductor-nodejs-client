@@ -4,7 +4,7 @@ import os from 'os'
 const HOSTNAME = os.hostname()
 const DEFAULT_OPTIONS = {
   pollingTime: 5,
-  baseURL: 'http://localhost:8080',
+  baseURL: 'http://localhost:8080/api',
   taskID: HOSTNAME,
   taskType: null
 }

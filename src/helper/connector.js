@@ -1,50 +1,47 @@
 import url from 'url'
 import HTTPClient from 'axios'
 
-export function getWorkflowDefinition (baseURL, workflowName, version = '1') {
-  let concatedUrl = url.resolve(baseURL, `/metadata/workflow/${workflowName}`)
-
-  return HTTPClient({
+export const getWorkflowDefinition = (baseURL, workflowName, version = '1') =>
+  HTTPClient({
     method: 'get',
-    url: concatedUrl,
+    baseURL,
+    url: `/metadata/workflow/${workflowName}`,
     params: {
       version: version
     }
   })
-}
 
 export function createWorkflowDef (baseURL, workflowDefBody) {
-  let concatedUrl = url.resolve(baseURL, '/metadata/workflow')
   return HTTPClient({
     method: 'post',
-    url: concatedUrl,
+    baseURL,
+    url: '/metadata/workflow',
     data: workflowDefBody
   })
 }
 
 export function updateWorkflowDefs (baseURL, workflowDefsBody) {
-  let concatedUrl = url.resolve(baseURL, '/metadata/workflow')
   return HTTPClient({
     method: 'put',
-    url: concatedUrl,
+    baseURL,
+    url: '/metadata/workflow',
     data: workflowDefsBody
   })
 }
 
 export function getAllWorkflowDefs (baseURL) {
-  let concatedUrl = url.resolve(baseURL, '/metadata/workflow')
   return HTTPClient({
     method: 'get',
-    url: concatedUrl
+    baseURL,
+    url: '/metadata/workflow'
   })
 }
 
 export function unRegisterWorkflowDef (baseURL, workflowDefName, version = '1') {
-  let concatedUrl = url.resolve(baseURL, `/metadata/workflow/${workflowDefName}/${version}`)
-
   return HTTPClient({
     method: 'delete',
-    url: concatedUrl,
+    baseURL,
+    url: `/metadata/workflow/${workflowDefName}/${version}`,
     params: {
       version: version
     }
@@ -52,81 +49,73 @@ export function unRegisterWorkflowDef (baseURL, workflowDefName, version = '1') 
 }
 
 export function getTaskDef (baseURL, taskDefName) {
-  let concatedUrl = url.resolve(baseURL, `/metadata/taskdefs/${taskDefName}`)
-
   return HTTPClient({
     method: 'get',
-    url: concatedUrl
+    baseURL,
+    url: `/metadata/taskdefs/${taskDefName}`
   })
 }
 
 export function registerTaskDefs (baseURL, taskDefsMeta) {
-  let concatedUrl = url.resolve(baseURL, '/metadata/taskdefs')
-
   return HTTPClient({
     method: 'post',
-    url: concatedUrl,
+    baseURL,
+    url: '/metadata/taskdefs',
     data: taskDefsMeta
   })
 }
 
 export function updateTaskDef (baseURL, taskDefMeta) {
-  let concatedUrl = url.resolve(baseURL, '/metadata/taskdefs')
-
   return HTTPClient({
     method: 'put',
-    url: concatedUrl,
+    baseURL,
+    url: '/metadata/taskdefs',
     data: taskDefMeta
   })
 }
 
 export function unRegisterTaskDef (baseURL, taskDefName) {
-  let concatedUrl = url.resolve(baseURL, `/metadata/taskdefs/${taskDefName}`)
-
   return HTTPClient({
     method: 'delete',
-    url: concatedUrl
+    baseURL,
+    url: `/metadata/taskdefs/${taskDefName}`
   })
 }
 
 export function getAllTaskDefs (baseURL) {
-  let concatedUrl = url.resolve(baseURL, '/metadata/taskdefs')
-
   return HTTPClient({
     method: 'get',
-    url: concatedUrl
+    baseURL,
+    url: '/metadata/taskdefs'
   })
 }
 
-/**********************/
+/** ********************/
 /* Task Functions	  */
-/**********************/
+/** ********************/
 
 export function getTask (baseURL, taskID) {
-  let concatedUrl = url.resolve(baseURL, `/tasks/${taskID}`)
-
   return HTTPClient({
     method: 'get',
-    url: concatedUrl
+    baseURL,
+    url: `/tasks/${taskID}`
   })
 }
 
 export function updateTask (baseURL, taskBody) {
-  let concatedUrl = url.resolve(baseURL, '/tasks')
-
   return HTTPClient({
     method: 'get',
-    url: concatedUrl,
+    baseURL,
+    url: '/tasks',
     data: taskBody
   })
 }
 
 export function pollForTask (baseURL, taskType, workerID) {
-  let concatedUrl = url.resolve(baseURL, `/tasks/poll/${taskType}`)
-
   return HTTPClient({
     method: 'get',
-    url: concatedUrl,
+    baseURL,
+    url: `/tasks/poll/${taskType}`,
     params: {
       workerid: workerID
     }
@@ -134,11 +123,10 @@ export function pollForTask (baseURL, taskType, workerID) {
 }
 
 export function ackTask (baseURL, taskType, workerID) {
-  let concatedUrl = url.resolve(baseURL, `/tasks/${taskType}/ack`)
-
   return HTTPClient({
     method: 'post',
-    url: concatedUrl,
+    baseURL,
+    url: `/tasks/${taskType}/ack`,
     headers: {
       Accept: 'text/plain'
     },
@@ -149,55 +137,56 @@ export function ackTask (baseURL, taskType, workerID) {
 }
 
 export function getAllTasksInQueue (baseURL) {
-  let concatedUrl = url.resolve(baseURL, '/tasks/queue/all')
-
   return HTTPClient({
     method: 'get',
-    url: concatedUrl
+    baseURL,
+    url: '/tasks/queue/all'
   })
 }
 
 export function removeTaskFromQueue (baseURL, taskType, taskID) {
-  let concatedUrl = url.resolve(baseURL, `/tasks/queue/${taskType}/${taskID}`)
-
   return HTTPClient({
     method: 'delete',
-    url: concatedUrl
+    baseURL,
+    url: `/tasks/queue/${taskType}/${taskID}`
   })
 }
 
 export function getTaskQueueSizes (baseURL, taskNames) {
-  let concatedUrl = url.resolve(baseURL, '/tasks/queue/sizes')
-
   return HTTPClient({
     method: 'post',
-    url: concatedUrl,
+    baseURL,
+    url: '/tasks/queue/sizes',
     data: taskNames
   })
 }
 
-/**********************/
+/** ********************/
 /* Workflow Functions */
-/**********************/
+/** ********************/
 
 export function getWorkflow (baseURL, workflowId, includeTasks) {
-  let concatedUrl = url.resolve(baseURL, `/workflow/${workflowId}`)
-
   return HTTPClient({
     method: 'get',
-    url: concatedUrl,
+    baseURL,
+    url: `/workflow/${workflowId}`,
     params: {
       includeTasks: includeTasks ? 'true' : 'false'
     }
   })
 }
 
-export function getRunningWorkflows (baseURL, workflowName, version = '1', startTime, endTime) {
-  let concatedUrl = url.resolve(baseURL, `/workflow/running/${workflowName}`)
-
+export function getRunningWorkflows (
+  baseURL,
+  workflowName,
+  version = '1',
+  startTime,
+  endTime
+) {
   return HTTPClient({
     method: 'get',
-    url: concatedUrl,
+    baseURL,
+    url: `/workflow/running/${workflowName}`,
     params: {
       version: version
       // startTime: ,
@@ -213,73 +202,79 @@ export function getRunningWorkflows (baseURL, workflowName, version = '1', start
   // }
 }
 
-export function startWorkflow (baseURL, workflowName, version = '1', correlationId, inputJson = {}) {
-  let concatedUrl = url.resolve(baseURL, `/workflow/${workflowName}`)
-  let params = {version: version}
-  if (correlationId) {
-    params.correlationId = correlationId
-  }
+export function startWorkflow (
+  baseURL,
+  workflowName,
+  version = '1',
+  correlationId,
+  inputJson = {}
+) {
   return HTTPClient({
     method: 'post',
-    url: concatedUrl,
+    baseURL,
+    url: `/workflow/${workflowName}`,
     params: {
-      version: version
+      version: version,
+      correlationId: correlationId
     },
     data: inputJson
   })
 }
 
 export function terminateWorkflow (baseURL, workflowId, reason) {
-  let concatedUrl = url.resolve(baseURL, `/workflow/${workflowId}`)
-  let params = {}
-  if (reason) {
-    params.reason = reason
-  }
   return HTTPClient({
     method: 'delete',
-    url: concatedUrl,
-    params: params
+    baseURL,
+    url: `/workflow/${workflowId}`,
+    params: {
+      reason
+    }
   })
 }
 
 export function pauseWorkflow (baseURL, workflowId) {
-  let concatedUrl = url.resolve(baseURL, `/workflow/${workflowId}/pause`)
   return HTTPClient({
     method: 'put',
-    url: concatedUrl
+    baseURL,
+    url: `/workflow/${workflowId}/pause`
   })
 }
 
 export function resumeWorkflow (baseURL, workflowId) {
-  let concatedUrl = url.resolve(baseURL, `/workflow/${workflowId}/resume`)
   return HTTPClient({
     method: 'put',
-    url: concatedUrl
+    baseURL,
+    url: `/workflow/${workflowId}/resume`
   })
 }
 
-export function skipTaskFromWorkflow (baseURL, workflowId, taskReferenceName, skipTaskRequestBody) {
-  let concatedUrl = url.resolve(baseURL, `/workflow/${workflowId}/skiptask/${taskReferenceName}`)
+export function skipTaskFromWorkflow (
+  baseURL,
+  workflowId,
+  taskReferenceName,
+  skipTaskRequestBody
+) {
   return HTTPClient({
     method: 'put',
-    url: concatedUrl,
+    baseURL,
+    url: `/workflow/${workflowId}/skiptask/${taskReferenceName}`,
     data: skipTaskRequestBody
   })
 }
 
 export function rerunWorkflow (baseURL, workflowId, rerunWorkflowRequest = {}) {
-  let concatedUrl = url.resolve(baseURL, `/workflow/${workflowId}/rerun`)
   return HTTPClient({
     method: 'post',
-    url: concatedUrl,
+    baseURL,
+    url: `/workflow/${workflowId}/rerun`,
     data: rerunWorkflowRequest
   })
 }
 
 export function restartWorkflow (baseURL, workflowId) {
-  let concatedUrl = url.resolve(baseURL, `/workflow/${workflowId}/restart`)
   return HTTPClient({
     method: 'post',
-    url: concatedUrl
+    baseURL,
+    url: `/workflow/${workflowId}/restart`
   })
 }
