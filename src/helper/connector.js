@@ -103,7 +103,7 @@ export function getTask(baseURL, taskID) {
 
 export function updateTask(baseURL, taskBody) {
   return HTTPClient({
-    method: 'get',
+    method: 'post',
     baseURL,
     url: '/tasks',
     data: taskBody
@@ -116,7 +116,7 @@ export function pollForTask(baseURL, taskType, workerID) {
     baseURL,
     url: `/tasks/poll/${taskType}`,
     params: {
-      workerid: workerID
+      workerID: workerID
     }
   })
 }
@@ -130,7 +130,7 @@ export function ackTask(baseURL, taskType, workerID) {
       Accept: 'text/plain'
     },
     params: {
-      workerid: workerID
+      workerID: workerID
     }
   })
 }

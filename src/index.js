@@ -3,7 +3,7 @@ import os from 'os'
 import Watcher from './helper/watcher'
 
 export const DEFAULT_OPTIONS = {
-  workerId: os.hostname()
+  workerID: os.hostname()
 }
 
 export default class ConductorClient {
@@ -12,17 +12,12 @@ export default class ConductorClient {
     this.tasks = {}
   }
 
-  registerWatcher = (
-    taskType,
-    callback = f => f,
-    pollingIntervals = 1000,
-    startPolling = false
-  ) => {
+  registerWatcher = (taskType, callback = f => f, options = {}, startPolling = false) => {
     if (!taskType) throw new Error('Task type is required for registering watcher')
     if (this.tasks[taskType]) throw new Error(`Task "${taskType}" is already registered`)
     this.tasks[taskType] = new Watcher(
       taskType,
-      { pollingIntervals, baseURL: this.options.baseURL },
+      { ...this.options, ...options },
       callback,
       console.error
     )

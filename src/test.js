@@ -4,4 +4,9 @@ import ConductorClient from './index.js'
 
 const conductorClient = new ConductorClient({ baseURL: 'http://localhost:8080/api' })
 
-conductorClient.registerWatcher('get_money', console.log, 1000, true)
+conductorClient.registerWatcher(
+  'get_money',
+  console.log,
+  { pollingIntervals: 1000, autoAck: true, maxRunner: 1 },
+  true
+)
