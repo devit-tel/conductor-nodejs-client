@@ -1,132 +1,189 @@
 [
   {
-    "ownerApp": "address",
-    "createTime": 0,
-    "updateTime": 0,
-    "createdBy": "admin",
-    "updatedBy": "admin",
-    "name": "address.create",
-    "description": "Address creation",
-    "retryCount": 0,
-    "timeoutSeconds": 0,
-    "inputKeys": [
-      "address"
-    ],
-    "outputKeys": [
-      "address"
-    ],
-    "timeoutPolicy": "RETRY",
+    "name": "get_money",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": ["money"],
+    "outputKeys": ["queueId"],
+    "timeoutPolicy": "TIME_OUT_WF",
     "retryLogic": "FIXED",
-    "retryDelaySeconds": 0,
-    "responseTimeoutSeconds": 180,
-    "concurrentExecLimit": 0,
-    "rateLimitPerFrequency": 0,
-    "rateLimitFrequencyInSeconds": 0,
-    "inputTemplate": {}
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
   },
   {
-    "ownerApp": "address",
-    "createTime": 0,
-    "updateTime": 0,
-    "createdBy": "admin",
-    "updatedBy": "admin",
-    "name": "address.get",
-    "description": "Address getting",
-    "retryCount": 0,
-    "timeoutSeconds": 0,
-    "inputKeys": [
-      "address"
-    ],
-    "outputKeys": [
-      "address"
-    ],
-    "timeoutPolicy": "RETRY",
+    "name": "print_slip",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": ["money", "queueId", "chickens"],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
     "retryLogic": "FIXED",
-    "retryDelaySeconds": 0,
-    "responseTimeoutSeconds": 180,
-    "concurrentExecLimit": 0,
-    "rateLimitPerFrequency": 0,
-    "rateLimitFrequencyInSeconds": 0,
-    "inputTemplate": {}
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
   },
   {
-    "ownerApp": "fleet",
-    "createTime": 0,
-    "updateTime": 0,
-    "createdBy": "admin",
-    "updatedBy": "admin",
-    "name": "fleet.driver.request",
-    "description": "Request driver",
-    "retryCount": 0,
-    "timeoutSeconds": 0,
-    "inputKeys": [
-      "driverCount",
-      "skills",
-      "zone",
-      "orderId",
-      "env"
-    ],
-    "outputKeys": [
-      "drivers"
-    ],
-    "timeoutPolicy": "RETRY",
+    "name": "check_chickens",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": ["chickens"],
+    "outputKeys": ["isGotChickens"],
+    "timeoutPolicy": "TIME_OUT_WF",
     "retryLogic": "FIXED",
-    "retryDelaySeconds": 0,
-    "responseTimeoutSeconds": 180,
-    "concurrentExecLimit": 0,
-    "rateLimitPerFrequency": 0,
-    "rateLimitFrequencyInSeconds": 0,
-    "inputTemplate": {}
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
   },
   {
-    "ownerApp": "tms",
-    "createTime": 0,
-    "updateTime": 0,
-    "createdBy": "admin",
-    "updatedBy": "admin",
-    "name": "tms.task.create",
-    "description": "Create tasks",
-    "retryCount": 0,
-    "timeoutSeconds": 0,
-    "inputKeys": [
-      "order",
-      "tasks",
-      "isCreateTrip"
-    ],
-    "outputKeys": [
-      "tasks"
-    ],
-    "timeoutPolicy": "RETRY",
+    "name": "is_got_chickens",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": ["chickens"],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
     "retryLogic": "FIXED",
-    "retryDelaySeconds": 0,
-    "responseTimeoutSeconds": 180,
-    "concurrentExecLimit": 0,
-    "rateLimitPerFrequency": 0,
-    "rateLimitFrequencyInSeconds": 0,
-    "inputTemplate": {}
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
   },
   {
-    "ownerApp": "oms",
-    "createTime": 0,
-    "updateTime": 0,
-    "createdBy": "admin",
-    "updatedBy": "admin",
-    "name": "oms.order.summarize",
-    "description": "Get order summary",
-    "retryCount": 0,
-    "timeoutSeconds": 0,
-    "inputKeys": [
-    ],
-    "outputKeys": [
-      "drivers"
-    ],
-    "timeoutPolicy": "RETRY",
+    "name": "fire_chickens",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": ["chickens"],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
     "retryLogic": "FIXED",
-    "retryDelaySeconds": 0,
-    "responseTimeoutSeconds": 180,
-    "concurrentExecLimit": 0,
-    "rateLimitPerFrequency": 0,
-    "rateLimitFrequencyInSeconds": 0,
-    "inputTemplate": {}
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
+  },
+  {
+    "name": "put_chickens_on_counter",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": [],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
+  },
+  {
+    "name": "call_customer",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": ["queueId"],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
+  },
+  {
+    "name": "is_take_home",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": ["order_type"],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
+  },
+  {
+    "name": "withdraw_disk",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": [],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
+  },
+  {
+    "name": "put_chickens_on_disk",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": [],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
+  },
+  {
+    "name": "put_chickens_on_box",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": [],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
+  },
+  {
+    "name": "just_wait",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": [],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
+  },
+  {
+    "name": "dy_fork_1",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": [],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
+  },
+  {
+    "name": "dy_fork_2",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": [],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
+  },
+  {
+    "name": "dy_fork_3",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": [],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
+  },
+  {
+    "name": "dy_fork_4",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": [],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
+  },
+  {
+    "name": "just_done",
+    "retryCount": 3,
+    "timeoutSeconds": 3600,
+    "inputKeys": [],
+    "outputKeys": [],
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 60,
+    "responseTimeoutSeconds": 3600
   }
 ]
