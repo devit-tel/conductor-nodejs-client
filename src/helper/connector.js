@@ -116,7 +116,7 @@ export function pollForTask(baseURL, taskType, workerID) {
     baseURL,
     url: `/tasks/poll/${taskType}`,
     params: {
-      workerID: workerID
+      workerid: workerID
     }
   })
 }
@@ -126,11 +126,8 @@ export function ackTask(baseURL, taskType, workerID) {
     method: 'post',
     baseURL,
     url: `/tasks/${taskType}/ack`,
-    headers: {
-      Accept: 'text/plain'
-    },
     params: {
-      workerID: workerID
+      workerid: workerID
     }
   })
 }

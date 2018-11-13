@@ -1,4 +1,3 @@
-// import { fork } from 'child_process'
 import os from 'os'
 import Watcher from './helper/watcher'
 

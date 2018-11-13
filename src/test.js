@@ -6,7 +6,7 @@ const conductorClient = new ConductorClient({ baseURL: 'http://localhost:8080/ap
 
 conductorClient.registerWatcher(
   'get_money',
-  console.log,
+  data => console.log(data.taskId),
   { pollingIntervals: 1000, autoAck: true, maxRunner: 1 },
   true
 )
