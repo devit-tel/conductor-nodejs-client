@@ -1,3 +1,4 @@
+import os from 'os'
 import { pollForTask, ackTask, updateTask } from './connector'
 
 const DEFAULT_OPTIONS = {
@@ -5,7 +6,7 @@ const DEFAULT_OPTIONS = {
   baseURL: 'http://localhost:8080/api',
   maxRunner: 1,
   autoAck: true,
-  workerID: undefined
+  workerID: os.hostname()
 }
 
 export default class Watcher {
@@ -42,7 +43,7 @@ export default class Watcher {
   polling = async () => {
     this.startTime = new Date()
     try {
-      if (this.options.maxRunner >= this.runners.length) {
+      if (this.options.maxRunner > this.runners.length) {
         const { baseURL, workerID } = this.options
         const { data } = await pollForTask(baseURL, this.taskType, workerID)
         if (data) {
