@@ -161,7 +161,7 @@ export function getTaskQueueSizes(baseURL, taskNames) {
 /* Workflow Functions */
 /** ********************/
 
-export function getWorkflow(baseURL, workflowId, includeTasks) {
+export function getWorkflow(baseURL, workflowId, includeTasks = true) {
   return HTTPClient({
     method: 'get',
     baseURL,
@@ -190,6 +190,28 @@ export function getRunningWorkflows(baseURL, workflowName, version = '1', startT
   // if endTime != 0 {
   //   params["endTime"] = strconv.FormatFloat(endTime, 'f', -1, 64)
   // }
+}
+
+export function searchWorkflows(
+  baseURL,
+  start = 0,
+  size = 20,
+  sort = 'ASC:createTime',
+  freeText,
+  query
+) {
+  return HTTPClient({
+    method: 'get',
+    baseURL,
+    url: '/workflow/search',
+    params: {
+      start: '',
+      size: '',
+      sort: '',
+      freeText: '',
+      query: ''
+    }
+  })
 }
 
 export function startWorkflow(baseURL, workflowName, version = '1', correlationId, inputJson = {}) {
