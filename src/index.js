@@ -115,6 +115,7 @@ export default class ConductorClient {
       console.error
     )
     if (startPolling) this.tasks[taskType].startPolling()
+    return this.tasks[taskType]
   }
 
   startPolling = () => {
