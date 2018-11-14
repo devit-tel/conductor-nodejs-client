@@ -74,17 +74,25 @@ export default class Watcher {
               this.errorCallback(new Error(`Task "${data.taskId}" is not update in time`))
             }, data.responseTimeoutSeconds * 1000)
           }
-
-          this.callback(data, ({ status, outputData, reasonForIncompletion = '' }) =>
-            // This make life more easier
+          try {
+            await this.callback(data, ({ status, outputData, reasonForIncompletion = '' }) =>
+              // This make life more easier
+              this.updateResult({
+                workflowInstanceId: data.workflowInstanceId,
+                taskId: data.taskId,
+                reasonForIncompletion,
+                status,
+                outputData
+              })
+            )
+          } catch (error) {
             this.updateResult({
               workflowInstanceId: data.workflowInstanceId,
               taskId: data.taskId,
-              reasonForIncompletion,
-              status,
-              outputData
+              reasonForIncompletion: error.message,
+              status: TASK_STATUS.FAILED
             })
-          )
+          }
         }
       }
     } catch (error) {
