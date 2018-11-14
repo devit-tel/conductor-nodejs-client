@@ -26,7 +26,7 @@ conductorClient.registerWatcher(
   'check_chickens',
   (data, updater) => {
     console.log(data.taskType, data.inputData)
-    updater({ status: 'COMPLETED' })
+    updater({ status: 'COMPLETED', outputData: { isGotChickens: 'yes' } })
   },
   { pollingIntervals: 1000, autoAck: true, maxRunner: 1 },
   true
