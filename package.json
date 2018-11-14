@@ -1,24 +1,41 @@
 {
   "name": "conductor-client",
-  "version": "0.0.1",
+  "version": "0.0.6",
   "description": "Conductor client for nodejs ",
-  "main": "index.js",
+  "main": "./build/index.js",
   "scripts": {
     "clean": "rm -rf build && mkdir build",
-    "watch": "nodemon src/test.js --exec babel-node -e js",
+    "test": "nodemon src/test.js --exec babel-node -e js",
     "build": "npm run clean && babel -d ./build ./src -s",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepublish": "npm run build"
   },
   "author": "Watchrapong Agsonchu",
   "license": "ISC",
   "dependencies": {
+    "@babel/runtime": "^7.1.5",
     "axios": "0.18.0",
     "nanotimer": "^0.3.15"
   },
+  "keywords": [
+    "conductor",
+    "conductor-nodejs-client"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sendit-asia/conductor-nodejs-client.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sendit-asia/conductor-nodejs-client/issues"
+  },
+  "homepage": "https://github.com/sendit-asia/conductor-nodejs-client#readme",
   "devDependencies": {
+    "@babel/cli": "^7.0.0",
     "@babel/core": "^7.1.5",
     "@babel/node": "^7.0.0",
-    "@babel/cli": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/plugin-proposal-decorators": "^7.0.0",
     "@babel/plugin-proposal-do-expressions": "^7.0.0",
     "@babel/plugin-proposal-export-default-from": "^7.0.0",
@@ -29,15 +46,14 @@
     "@babel/plugin-proposal-logical-assignment-operators": "^7.0.0",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.0.0",
     "@babel/plugin-proposal-numeric-separator": "^7.0.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "@babel/plugin-proposal-optional-chaining": "^7.0.0",
     "@babel/plugin-proposal-pipeline-operator": "^7.0.0",
     "@babel/plugin-proposal-throw-expressions": "^7.0.0",
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/plugin-syntax-import-meta": "^7.0.0",
+    "@babel/plugin-transform-runtime": "^7.1.0",
     "@babel/preset-env": "^7.0.0",
-    "@babel/plugin-proposal-class-properties": "^7.1.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
-    "@babel/plugin-transform-runtime": "^7.0.0",
     "babel-eslint": "^9.0.0",
     "eslint": "^3.10.1",
     "eslint-config-airbnb": "^17.1.0",
