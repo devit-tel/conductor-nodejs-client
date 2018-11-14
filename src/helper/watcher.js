@@ -1,12 +1,24 @@
-import { pollForTask } from './connector'
+import os from 'os'
+import { pollForTask, ackTask, updateTask } from './connector'
 
 const DEFAULT_OPTIONS = {
   pollingIntervals: 1000,
-  baseURL: 'http://localhost:8080/api'
+  baseURL: 'http://localhost:8080/api',
+  maxRunner: 1,
+  autoAck: true,
+  workerID: os.hostname()
+}
+
+const TASK_STATUS = {
+  IN_PROGRESS: 'IN_PROGRESS',
+  FAILED: 'FAILED',
+  COMPLETED: 'COMPLETED'
 }
 
 export default class Watcher {
   isPolling = false
+  tasks = {}
+  tasksTimeout = {}
 
   constructor(taskType, options, callback, errorCallback = f => f) {
     if (!callback) throw new Error('Callback function is required')
@@ -16,14 +28,64 @@ export default class Watcher {
     this.errorCallback = errorCallback
   }
 
+  destroyTaskTimeout = taskId => {
+    clearTimeout(this.tasksTimeout[taskId])
+    delete this.tasks[taskId]
+  }
+
+  destroyTask = taskId => delete this.tasks[taskId]
+
+  ackTask = taskId => ackTask(this.options.baseURL, taskId, this.options.workerID)
+
+  updateResult = ({
+    workflowInstanceId,
+    taskId,
+    reasonForIncompletion,
+    status,
+    outputData = {}
+  }) => {
+    if ([TASK_STATUS.FAILED, TASK_STATUS.COMPLETED].includes(status)) {
+      this.destroyTaskTimeout(taskId)
+      this.destroyTask(taskId)
+    }
+    return updateTask(this.options.baseURL, {
+      workflowInstanceId,
+      taskId,
+      reasonForIncompletion,
+      status,
+      outputData
+    })
+  }
+
   // this should be private function
   polling = async () => {
     this.startTime = new Date()
     try {
-      const { baseURL, workerID } = this.options
-      const { data } = await pollForTask(baseURL, this.taskType, workerID)
-      if (data) {
-        this.callback(data)
+      if (this.options.maxRunner > Object.keys(this.tasks).length) {
+        const { baseURL, workerID } = this.options
+        const { data } = await pollForTask(baseURL, this.taskType, workerID)
+        if (data) {
+          this.tasks[data.taskId] = data
+          if (this.options.autoAck === true) await this.ackTask(data.taskId)
+
+          if (data.responseTimeoutSeconds > 0) {
+            this.tasksTimeout[data.taskId] = setTimeout(() => {
+              this.destroyTask(data.taskId)
+              this.errorCallback(new Error(`Task "${data.taskId}" is not update in time`))
+            }, data.responseTimeoutSeconds * 1000)
+          }
+
+          this.callback(data, ({ status, outputData, reasonForIncompletion = '' }) =>
+            // This make life more easier
+            this.updateResult({
+              workflowInstanceId: data.workflowInstanceId,
+              taskId: data.taskId,
+              reasonForIncompletion,
+              status,
+              outputData
+            })
+          )
+        }
       }
     } catch (error) {
       this.errorCallback(error)
