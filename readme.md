@@ -1,5 +1,7 @@
 # conductor-client
 
+[![npm](https://img.shields.io/npm/v/conductor-client.svg)](https://www.npmjs.com/package/conductor-client) [![GitHub issues](https://img.shields.io/github/issues/sendit-asia/conductor-nodejs-client.svg)](https://github.com/sendit-asia/conductor-nodejs-client) [![npm bundle size (minified)](https://img.shields.io/bundlephobia/min/conductor-client.svg)](https://www.npmjs.com/package/conductor-client) [![npm](https://img.shields.io/npm/dt/conductor-client.svg)](https://www.npmjs.com/package/conductor-client)
+
 ### Install
 
 ```
@@ -560,26 +562,13 @@ conductorClient.updateWorkflowDefs(workflowDefs).then(() =>
 )
 ```
 
-### ConductorClient's method
+### ConductorClient method
 
-- registerWatcher(taskType, callback = f => f, options = {}, startPolling = false)
-  -- Description
-  --- register a watcher to polling for task
-  -- Arguments
-  --- taskType (String): taskType to register
-  --- callback (Function(data, updater(data))): callback function that fired if found task
-  --- options (Object): see below, options to overide client options
-  --- startPolling (Boolean): if set to true, watcher will start polling right away
-  -- Returns
-  -- worker (Worker's Object): worker object
+- registerWatcher(taskType, callback = f => f, options = {}, startPolling = false) - Description - register a watcher to polling for task - Arguments - taskType (String): taskType to register - callback (Function(data, updater(data))): callback function that fired if found task - options (Object): see below, options to overide client options - startPolling (Boolean): if set to true, watcher will start polling right away - Returns - worker (Worker's Object): worker object
 
-- startPolling()
-  -- Description
-  --- If set startPolling to false on registerWatcher can call this method to let all workers start polling
+- startPolling() - Description - If set startPolling to false on registerWatcher can call this method to let all workers start polling
 
-- getWorkflowDefinition(workflowName: string, varsion: number = 1)
-  -- Description
-  --- get workflow by workflowName
+- getWorkflowDefinition(workflowName: string, varsion: number = 1) - Description - get workflow by workflowName
 
 - getAllWorkflowDefs()
 
@@ -619,24 +608,26 @@ conductorClient.updateWorkflowDefs(workflowDefs).then(() =>
 
 - rerunWorkflow(workflowId, reRunFromWorkflowId, workflowInput = {}, reRunFromTaskId, taskInput = {})
 
-### ConductorClient's options
+### ConductorClient options
 
 ConductorClient options will pass to watcher's options as default value and can overide per each worker by using registerWatcher
-| property | default value | type | description |
-|------------------|---------------------------------------------------|---------|---------------------------------------|
-| baseURL | http://localhost:8080/api | String | base url of conductor server |
-| workerID | computer's hostname e.g. someone's-computer.local | String | unique worker ID |
-| pollingIntervals | 1000 | Number | polling interval in millisecond |
-| maxRunner | 1 | Number | Nummber of running tasks per taskType |
-| autoAck | true | Boolean | Auto send ack when poll a task |
 
-### watcher's option
+| property         | default value                                     | type    | description                           |
+| ---------------- | ------------------------------------------------- | ------- | ------------------------------------- |
+| baseURL          | http://localhost:8080/api                         | String  | base url of conductor server          |
+| workerID         | computer's hostname e.g. someone's-computer.local | String  | unique worker ID                      |
+| pollingIntervals | 1000                                              | Number  | polling interval in millisecond       |
+| maxRunner        | 1                                                 | Number  | Nummber of running tasks per taskType |
+| autoAck          | true                                              | Boolean | Auto send ack when poll a task        |
+
+### Watcher option
 
 The same as ConductorClient options but this option will overided
-| property | default value | type | description |
-|------------------|---------------------------------------------------|---------|---------------------------------------|
-| baseURL | http://localhost:8080/api | String | base url of conductor server |
-| workerID | computer's hostname e.g. someone's-computer.local | String | unique worker ID |
-| pollingIntervals | 1000 | Number | polling interval in millisecond |
-| maxRunner | 1 | Number | Nummber of running tasks per taskType |
-| autoAck | true | Boolean | Auto send ack when poll a task |
+
+| property         | default value                                     | type    | description                           |
+| ---------------- | ------------------------------------------------- | ------- | ------------------------------------- |
+| baseURL          | http://localhost:8080/api                         | String  | base url of conductor server          |
+| workerID         | computer's hostname e.g. someone's-computer.local | String  | unique worker ID                      |
+| pollingIntervals | 1000                                              | Number  | polling interval in millisecond       |
+| maxRunner        | 1                                                 | Number  | Nummber of running tasks per taskType |
+| autoAck          | true                                              | Boolean | Auto send ack when poll a task        |

@@ -1,6 +1,6 @@
 {
   "name": "conductor-client",
-  "version": "0.0.8",
+  "version": "0.0.10",
   "description": "Conductor client for nodejs ",
   "main": "./build/index.js",
   "scripts": {
