@@ -4,9 +4,7 @@
 
 ### Install
 
-```
-npm i -s conductor-client
-```
+`npm i -s conductor-client`
 
 ### Usage
 
@@ -564,11 +562,32 @@ conductorClient.updateWorkflowDefs(workflowDefs).then(() =>
 
 ### ConductorClient method
 
-- registerWatcher(taskType, callback = f => f, options = {}, startPolling = false) - Description - register a watcher to polling for task - Arguments - taskType (String): taskType to register - callback (Function(data, updater(data))): callback function that fired if found task - options (Object): see below, options to overide client options - startPolling (Boolean): if set to true, watcher will start polling right away - Returns - worker (Worker's Object): worker object
+- constructor(options)
 
-- startPolling() - Description - If set startPolling to false on registerWatcher can call this method to let all workers start polling
+  - Arguments
+    - options (Object): see below
 
-- getWorkflowDefinition(workflowName: string, varsion: number = 1) - Description - get workflow by workflowName
+- registerWatcher(taskType, callback = f => f, options = {}, startPolling = false)
+
+  - Description
+    - register a watcher to polling for task
+  - Arguments
+    - taskType (String): taskType to register
+    - callback (Function(data, updater(data))): callback function that fired if found task
+    - options (Object): see below, options to overide client options
+    - startPolling (Boolean): if set to true, watcher will start polling right away
+  - Returns
+    - worker (Worker's Object): worker object
+
+- startPolling()
+
+  - Description
+    - If set startPolling to false on registerWatcher can call this method to let all workers start polling
+
+- getWorkflowDefinition(workflowName: string, varsion: number = 1)
+
+  - Description
+    - get workflow by workflowName
 
 - getAllWorkflowDefs()
 
