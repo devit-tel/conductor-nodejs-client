@@ -4,7 +4,6 @@
   "plugins": ["babel", "prettier"],
   "rules": {
     "prettier/prettier": ["error"],
-    "class-methods-use-this": "off",
     "no-restricted-syntax": ["error", "WithStatement"],
     "no-await-in-loop": "off",
     "no-underscore-dangle": "off",
