@@ -6,14 +6,44 @@
 
 `npm i -s conductor-client`
 
-### Usage
+### Example
+
+This example will create 3 workflow (fail_rollback, withdraw_chickens, order_chickens), 19 tasks then start "order_chickens" workflow
 
 ```javascript
 const ConductorClient = require('conductor-client').default
 
-const conductorClient = new ConductorClient({ baseURL: 'http://localhost:8080/api' })
+const conductorClient = new ConductorClient({
+  baseURL: 'http://localhost:8080/api'
+})
 
 const workflowDefs = [
+  {
+    name: 'fail_rollback',
+    description: 'Fail rollback',
+    version: 1,
+    tasks: [
+      {
+        name: 'check_fail1',
+        taskReferenceName: 'check_fail1',
+        type: 'SIMPLE',
+        startDelay: 0,
+        optional: false
+      },
+      {
+        name: 'check_fail1',
+        taskReferenceName: 'check_fail2',
+        inputParameters: {
+          chickens: '${workflow.input.chickens}'
+        },
+        type: 'SIMPLE',
+        startDelay: 0,
+        optional: false
+      }
+    ],
+    inputParameters: ['orderType', 'chickens', 'orderType'],
+    schemaVersion: 2
+  },
   {
     name: 'withdraw_chickens',
     description: 'Withdraw chickens',
@@ -203,11 +233,34 @@ const workflowDefs = [
       }
     ],
     inputParameters: ['orderType', 'chickens', 'money'],
+    failureWorkflow: 'fail_rollback',
     schemaVersion: 2
   }
 ]
 
 const taskDefs = [
+  {
+    name: 'check_fail1',
+    retryCount: 3,
+    timeoutSeconds: 3600,
+    inputKeys: ['money'],
+    outputKeys: ['queueId'],
+    timeoutPolicy: 'TIME_OUT_WF',
+    retryLogic: 'FIXED',
+    retryDelaySeconds: 60,
+    responseTimeoutSeconds: 3600
+  },
+  {
+    name: 'check_fail2',
+    retryCount: 3,
+    timeoutSeconds: 3600,
+    inputKeys: ['money'],
+    outputKeys: ['queueId'],
+    timeoutPolicy: 'TIME_OUT_WF',
+    retryLogic: 'FIXED',
+    retryDelaySeconds: 60,
+    responseTimeoutSeconds: 3600
+  },
   {
     name: 'get_money',
     retryCount: 3,
@@ -402,7 +455,7 @@ conductorClient.updateWorkflowDefs(workflowDefs).then(() =>
     conductorClient.registerWatcher(
       'get_money',
       (data, updater) => {
-        console.log(data.taskType, data.inputData)
+        console.log(data)
         updater({ status: 'COMPLETED', outputData: { queueId: '12354423' } })
       },
       { pollingIntervals: 1000, autoAck: true, maxRunner: 1 },
@@ -410,9 +463,9 @@ conductorClient.updateWorkflowDefs(workflowDefs).then(() =>
     )
     conductorClient.registerWatcher(
       'print_slip',
-      (data, updater) => {
+      async (data, updater) => {
         console.log(data.taskType, data.inputData)
-        updater({ status: 'COMPLETED' })
+        setTimeout(() => updater({ status: 'COMPLETED' }), 6000)
       },
       { pollingIntervals: 1000, autoAck: true, maxRunner: 1 },
       true
@@ -534,7 +587,7 @@ conductorClient.updateWorkflowDefs(workflowDefs).then(() =>
     conductorClient.registerWatcher(
       'dy_fork_4',
       (data, updater) => {
-        console.log(data.taskType, data.inputData)
+        console.log(data, data.inputData)
         updater({ status: 'COMPLETED' })
       },
       { pollingIntervals: 1000, autoAck: true, maxRunner: 1 },
@@ -550,11 +603,11 @@ conductorClient.updateWorkflowDefs(workflowDefs).then(() =>
       { pollingIntervals: 1000, autoAck: true, maxRunner: 1 },
       true
     )
+
     conductorClient.startWorkflow('order_chickens', {
       money: 500,
       orderType: 'takehome',
-      chickens: 20,
-      task2Name: 'task_5'
+      chickens: 20
     })
   })
 )
