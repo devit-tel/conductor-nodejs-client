@@ -42,18 +42,21 @@ export default class Watcher {
     taskId,
     reasonForIncompletion,
     status,
-    outputData = {}
+    outputData = {},
+    ...extraTaskData
   }) => {
     if ([TASK_STATUS.FAILED, TASK_STATUS.COMPLETED].includes(status)) {
       this.destroyTaskTimeout(taskId)
       this.destroyTask(taskId)
     }
+
     return updateTask(this.options.baseURL, {
       workflowInstanceId,
       taskId,
       reasonForIncompletion,
       status,
-      outputData
+      outputData,
+      ...extraTaskData
     })
   }
 
@@ -75,15 +78,18 @@ export default class Watcher {
             }, data.responseTimeoutSeconds * 1000)
           }
           try {
-            await this.callback(data, ({ status, outputData, reasonForIncompletion = '' }) =>
-              // This make life more easier
-              this.updateResult({
-                workflowInstanceId: data.workflowInstanceId,
-                taskId: data.taskId,
-                reasonForIncompletion,
-                status,
-                outputData
-              })
+            await this.callback(
+              data,
+              ({ status, outputData, reasonForIncompletion = '', ...extraTaskData }) =>
+                // This make life more easier
+                this.updateResult({
+                  workflowInstanceId: data.workflowInstanceId,
+                  taskId: data.taskId,
+                  reasonForIncompletion,
+                  status,
+                  outputData,
+                  ...extraTaskData
+                })
             )
           } catch (error) {
             this.updateResult({
