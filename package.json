@@ -13,9 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/runtime": "^7.1.5",
-    "axios": "0.18.0",
-    "lodash": "^4.17.11",
-    "nanotimer": "^0.3.15"
+    "axios": "0.18.0"
   },
   "keywords": [
     "conductor",

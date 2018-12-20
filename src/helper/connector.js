@@ -1,6 +1,6 @@
 import HTTPClient from 'axios'
 
-HTTPClient.defaults.headers['Content-Type'] = 'application/json';
+HTTPClient.defaults.headers['Content-Type'] = 'application/json'
 
 export const getWorkflowDefinition = (baseURL, workflowName, version = '1') =>
   HTTPClient({

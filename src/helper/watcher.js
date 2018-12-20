@@ -1,6 +1,5 @@
 import os from 'os'
 import { pollForTask, ackTask, updateTask } from './connector'
-import { assign } from 'lodash'
 
 const DEFAULT_OPTIONS = {
   pollingIntervals: 1000,
@@ -44,21 +43,21 @@ export default class Watcher {
     reasonForIncompletion,
     status,
     outputData = {},
-    extraTaskData = {}
+    ...extraTaskData
   }) => {
     if ([TASK_STATUS.FAILED, TASK_STATUS.COMPLETED].includes(status)) {
       this.destroyTaskTimeout(taskId)
       this.destroyTask(taskId)
     }
 
-    return updateTask(this.options.baseURL, assign({
+    return updateTask(this.options.baseURL, {
       workflowInstanceId,
       taskId,
       reasonForIncompletion,
       status,
-      outputData},
-      extraTaskData)
-    )
+      outputData,
+      ...extraTaskData
+    })
   }
 
   // this should be private function
@@ -79,24 +78,25 @@ export default class Watcher {
             }, data.responseTimeoutSeconds * 1000)
           }
           try {
-            await this.callback(data, ({ status, outputData, reasonForIncompletion = '',  extraTaskData = {}}) =>
-              // This make life more easier
-              this.updateResult({
-                workflowInstanceId: data.workflowInstanceId,
-                taskId: data.taskId,
-                reasonForIncompletion,
-                status,
-                outputData,
-                extraTaskData
-              })
+            await this.callback(
+              data,
+              ({ status, outputData, reasonForIncompletion = '', ...extraTaskData }) =>
+                // This make life more easier
+                this.updateResult({
+                  workflowInstanceId: data.workflowInstanceId,
+                  taskId: data.taskId,
+                  reasonForIncompletion,
+                  status,
+                  outputData,
+                  ...extraTaskData
+                })
             )
           } catch (error) {
             this.updateResult({
               workflowInstanceId: data.workflowInstanceId,
               taskId: data.taskId,
               reasonForIncompletion: error.message,
-              status: TASK_STATUS.FAILED,
-              extraTaskData
+              status: TASK_STATUS.FAILED
             })
           }
         }
