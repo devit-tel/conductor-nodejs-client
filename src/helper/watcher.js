@@ -54,10 +54,10 @@ export default class Watcher {
         outputData,
         ...extraTaskData
       })
-      if ([TASK_STATUS.IN_PROGRESS, TASK_STATUS.FAILED, TASK_STATUS.COMPLETED].includes(status)) {
-        this.destroyTaskTimeout(taskId)
-        this.destroyTask(taskId)
-      }
+      // if ([TASK_STATUS.IN_PROGRESS, TASK_STATUS.FAILED, TASK_STATUS.COMPLETED].includes(status)) {
+      //   this.destroyTaskTimeout(taskId)
+      //   this.destroyTask(taskId)
+      // }
       return result
     } catch (error) {
       throw error
@@ -142,6 +142,9 @@ export default class Watcher {
               reasonForIncompletion: error.message,
               status: TASK_STATUS.FAILED
             })
+          } finally {
+            this.destroyTaskTimeout(data.taskId)
+            this.destroyTask(data.taskId)
           }
         }
       }
