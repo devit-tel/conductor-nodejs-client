@@ -37,7 +37,7 @@ export default class Watcher {
 
   ackTask = taskId => ackTask(this.options.baseURL, taskId, this.options.workerID)
 
-  updateResult = ({
+  updateResult = async ({
     workflowInstanceId,
     taskId,
     reasonForIncompletion,
@@ -45,19 +45,23 @@ export default class Watcher {
     outputData = {},
     ...extraTaskData
   }) => {
-    if ([TASK_STATUS.FAILED, TASK_STATUS.COMPLETED].includes(status)) {
-      this.destroyTaskTimeout(taskId)
-      this.destroyTask(taskId)
+    try {
+      const result = updateTask(this.options.baseURL, {
+        workflowInstanceId,
+        taskId,
+        reasonForIncompletion,
+        status,
+        outputData,
+        ...extraTaskData
+      })
+      if ([TASK_STATUS.IN_PROGRESS, TASK_STATUS.FAILED, TASK_STATUS.COMPLETED].includes(status)) {
+        this.destroyTaskTimeout(taskId)
+        this.destroyTask(taskId)
+      }
+      return result
+    } catch (error) {
+      throw error
     }
-
-    return updateTask(this.options.baseURL, {
-      workflowInstanceId,
-      taskId,
-      reasonForIncompletion,
-      status,
-      outputData,
-      ...extraTaskData
-    })
   }
 
   // this should be private function
@@ -78,19 +82,59 @@ export default class Watcher {
             }, data.responseTimeoutSeconds * 1000)
           }
           try {
-            await this.callback(
-              data,
-              ({ status, outputData, reasonForIncompletion = '', ...extraTaskData }) =>
-                // This make life more easier
-                this.updateResult({
-                  workflowInstanceId: data.workflowInstanceId,
-                  taskId: data.taskId,
-                  reasonForIncompletion,
-                  status,
-                  outputData,
-                  ...extraTaskData
-                })
-            )
+            const callbackUpdater = ({
+              status,
+              outputData,
+              reasonForIncompletion = '',
+              ...extraTaskData
+            }) =>
+              this.updateResult({
+                workflowInstanceId: data.workflowInstanceId,
+                taskId: data.taskId,
+                reasonForIncompletion,
+                status,
+                outputData,
+                ...extraTaskData
+              })
+
+            callbackUpdater.complete = ({
+              outputData,
+              reasonForIncompletion = '',
+              ...extraTaskData
+            }) =>
+              this.updateResult({
+                workflowInstanceId: data.workflowInstanceId,
+                taskId: data.taskId,
+                reasonForIncompletion,
+                status: TASK_STATUS.COMPLETED,
+                outputData,
+                ...extraTaskData
+              })
+
+            callbackUpdater.fail = ({ outputData, reasonForIncompletion = '', ...extraTaskData }) =>
+              this.updateResult({
+                workflowInstanceId: data.workflowInstanceId,
+                taskId: data.taskId,
+                reasonForIncompletion,
+                status: TASK_STATUS.FAILED,
+                outputData,
+                ...extraTaskData
+              })
+            callbackUpdater.inprogress = ({
+              outputData,
+              reasonForIncompletion = '',
+              ...extraTaskData
+            }) =>
+              this.updateResult({
+                workflowInstanceId: data.workflowInstanceId,
+                taskId: data.taskId,
+                reasonForIncompletion,
+                status: TASK_STATUS.IN_PROGRESS,
+                outputData,
+                ...extraTaskData
+              })
+
+            await this.callback(data, callbackUpdater)
           } catch (error) {
             this.updateResult({
               workflowInstanceId: data.workflowInstanceId,

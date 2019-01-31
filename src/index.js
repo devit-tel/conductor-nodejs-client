@@ -20,7 +20,8 @@ import {
   restartWorkflow,
   getWorkflow,
   getRunningWorkflows,
-  searchWorkflows
+  searchWorkflows,
+  updateTask
 } from './helper/connector'
 
 export const DEFAULT_OPTIONS = {
@@ -61,14 +62,7 @@ export default class ConductorClient {
     getWorkflow(this.options.baseURL, workflowId, includeTasks)
 
   searchWorkflows = (start = 0, size = 20, sort = 'ASC:createTime', freeText, query) =>
-    searchWorkflows(
-      this.options.baseURL,
-      (start = 0),
-      (size = 20),
-      (sort = 'ASC:createTime'),
-      freeText,
-      query
-    )
+    searchWorkflows(this.options.baseURL, start, size, sort, freeText, query)
 
   getRunningWorkflows = (workflowName, version = '1') =>
     getRunningWorkflows(this.options.baseURL, workflowName, (version = '1'))
@@ -104,6 +98,8 @@ export default class ConductorClient {
       reRunFromTaskId,
       taskInput
     })
+
+  updateTask = taskBody => updateTask(this.options.baseURL, taskBody)
 
   registerWatcher = (taskType, callback = f => f, options = {}, startPolling = false) => {
     if (!taskType) throw new Error('Task type is required for registering watcher')
