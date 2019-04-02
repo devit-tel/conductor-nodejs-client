@@ -81,74 +81,68 @@ export default class Watcher {
               this.errorCallback(new Error(`Task "${data.taskId}" is not update in time`))
             }, data.responseTimeoutSeconds * 1000)
           }
-          const callbackUpdater = ({
-            status,
-            outputData,
-            reasonForIncompletion = '',
-            ...extraTaskData
-          }) =>
-            this.updateResult({
-              workflowInstanceId: data.workflowInstanceId,
-              taskId: data.taskId,
-              reasonForIncompletion,
+          try {
+            const callbackUpdater = ({
               status,
               outputData,
+              reasonForIncompletion = '',
               ...extraTaskData
-            })
-
-          callbackUpdater.complete = ({
-            outputData,
-            reasonForIncompletion = '',
-            ...extraTaskData
-          }) =>
-            this.updateResult({
-              workflowInstanceId: data.workflowInstanceId,
-              taskId: data.taskId,
-              reasonForIncompletion,
-              status: TASK_STATUS.COMPLETED,
-              outputData,
-              ...extraTaskData
-            })
-
-          callbackUpdater.fail = ({ outputData, reasonForIncompletion = '', ...extraTaskData }) =>
-            this.updateResult({
-              workflowInstanceId: data.workflowInstanceId,
-              taskId: data.taskId,
-              reasonForIncompletion,
-              status: TASK_STATUS.FAILED,
-              outputData,
-              ...extraTaskData
-            })
-          callbackUpdater.inprogress = ({
-            outputData,
-            reasonForIncompletion = '',
-            ...extraTaskData
-          }) =>
-            this.updateResult({
-              workflowInstanceId: data.workflowInstanceId,
-              taskId: data.taskId,
-              reasonForIncompletion,
-              status: TASK_STATUS.IN_PROGRESS,
-              outputData,
-              ...extraTaskData
-            })
-
-          const cb = this.callback(data, callbackUpdater)
-          if (typeof cb.catch === 'function') {
-            cb.then(() => {
-              this.destroyTaskTimeout(data.taskId)
-              this.destroyTask(data.taskId)
-            }).catch(error => {
-              this.destroyTaskTimeout(data.taskId)
-              this.destroyTask(data.taskId)
+            }) =>
               this.updateResult({
                 workflowInstanceId: data.workflowInstanceId,
                 taskId: data.taskId,
-                reasonForIncompletion: error.message,
-                status: TASK_STATUS.FAILED
+                reasonForIncompletion,
+                status,
+                outputData,
+                ...extraTaskData
               })
+
+            callbackUpdater.complete = ({
+              outputData,
+              reasonForIncompletion = '',
+              ...extraTaskData
+            }) =>
+              this.updateResult({
+                workflowInstanceId: data.workflowInstanceId,
+                taskId: data.taskId,
+                reasonForIncompletion,
+                status: TASK_STATUS.COMPLETED,
+                outputData,
+                ...extraTaskData
+              })
+
+            callbackUpdater.fail = ({ outputData, reasonForIncompletion = '', ...extraTaskData }) =>
+              this.updateResult({
+                workflowInstanceId: data.workflowInstanceId,
+                taskId: data.taskId,
+                reasonForIncompletion,
+                status: TASK_STATUS.FAILED,
+                outputData,
+                ...extraTaskData
+              })
+            callbackUpdater.inprogress = ({
+              outputData,
+              reasonForIncompletion = '',
+              ...extraTaskData
+            }) =>
+              this.updateResult({
+                workflowInstanceId: data.workflowInstanceId,
+                taskId: data.taskId,
+                reasonForIncompletion,
+                status: TASK_STATUS.IN_PROGRESS,
+                outputData,
+                ...extraTaskData
+              })
+
+            await this.callback(data, callbackUpdater)
+          } catch (error) {
+            this.updateResult({
+              workflowInstanceId: data.workflowInstanceId,
+              taskId: data.taskId,
+              reasonForIncompletion: error.message,
+              status: TASK_STATUS.FAILED
             })
-          } else {
+          } finally {
             this.destroyTaskTimeout(data.taskId)
             this.destroyTask(data.taskId)
           }
