@@ -123,6 +123,18 @@ export function pollForTask(baseURL, taskType, workerID) {
   })
 }
 
+export function pollForTasks(baseURL, taskType, workerID, count = 1) {
+  return HTTPClient({
+    method: 'get',
+    baseURL,
+    url: `/tasks/poll/batch/${taskType}`,
+    params: {
+      workerid: workerID,
+      count
+    }
+  })
+}
+
 export function ackTask(baseURL, taskType, workerID) {
   return HTTPClient({
     method: 'post',
