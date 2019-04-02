@@ -68,84 +68,82 @@ export default class Watcher {
   polling = async () => {
     this.startTime = new Date()
     try {
-      if (this.options.maxRunner > Object.keys(this.tasks).length) {
-        const { baseURL, workerID } = this.options
-        const { data } = await pollForTask(baseURL, this.taskType, workerID)
-        if (data) {
-          this.tasks[data.taskId] = data
-          if (this.options.autoAck === true) await this.ackTask(data.taskId)
+      const { baseURL, workerID } = this.options
+      const { data } = await pollForTask(baseURL, this.taskType, workerID)
+      if (data) {
+        this.tasks[data.taskId] = data
+        if (this.options.autoAck === true) await this.ackTask(data.taskId)
 
-          if (data.responseTimeoutSeconds > 0) {
-            this.tasksTimeout[data.taskId] = setTimeout(() => {
-              this.destroyTask(data.taskId)
-              this.errorCallback(new Error(`Task "${data.taskId}" is not update in time`))
-            }, data.responseTimeoutSeconds * 1000)
-          }
-          try {
-            const callbackUpdater = ({
-              status,
-              outputData,
-              reasonForIncompletion = '',
-              ...extraTaskData
-            }) =>
-              this.updateResult({
-                workflowInstanceId: data.workflowInstanceId,
-                taskId: data.taskId,
-                reasonForIncompletion,
-                status,
-                outputData,
-                ...extraTaskData
-              })
-
-            callbackUpdater.complete = ({
-              outputData,
-              reasonForIncompletion = '',
-              ...extraTaskData
-            }) =>
-              this.updateResult({
-                workflowInstanceId: data.workflowInstanceId,
-                taskId: data.taskId,
-                reasonForIncompletion,
-                status: TASK_STATUS.COMPLETED,
-                outputData,
-                ...extraTaskData
-              })
-
-            callbackUpdater.fail = ({ outputData, reasonForIncompletion = '', ...extraTaskData }) =>
-              this.updateResult({
-                workflowInstanceId: data.workflowInstanceId,
-                taskId: data.taskId,
-                reasonForIncompletion,
-                status: TASK_STATUS.FAILED,
-                outputData,
-                ...extraTaskData
-              })
-            callbackUpdater.inprogress = ({
-              outputData,
-              reasonForIncompletion = '',
-              ...extraTaskData
-            }) =>
-              this.updateResult({
-                workflowInstanceId: data.workflowInstanceId,
-                taskId: data.taskId,
-                reasonForIncompletion,
-                status: TASK_STATUS.IN_PROGRESS,
-                outputData,
-                ...extraTaskData
-              })
-
-            await this.callback(data, callbackUpdater)
-          } catch (error) {
+        if (data.responseTimeoutSeconds > 0) {
+          this.tasksTimeout[data.taskId] = setTimeout(() => {
+            this.destroyTask(data.taskId)
+            this.errorCallback(new Error(`Task "${data.taskId}" is not update in time`))
+          }, data.responseTimeoutSeconds * 1000)
+        }
+        try {
+          const callbackUpdater = ({
+            status,
+            outputData,
+            reasonForIncompletion = '',
+            ...extraTaskData
+          }) =>
             this.updateResult({
               workflowInstanceId: data.workflowInstanceId,
               taskId: data.taskId,
-              reasonForIncompletion: error.message,
-              status: TASK_STATUS.FAILED
+              reasonForIncompletion,
+              status,
+              outputData,
+              ...extraTaskData
             })
-          } finally {
-            this.destroyTaskTimeout(data.taskId)
-            this.destroyTask(data.taskId)
-          }
+
+          callbackUpdater.complete = ({
+            outputData,
+            reasonForIncompletion = '',
+            ...extraTaskData
+          }) =>
+            this.updateResult({
+              workflowInstanceId: data.workflowInstanceId,
+              taskId: data.taskId,
+              reasonForIncompletion,
+              status: TASK_STATUS.COMPLETED,
+              outputData,
+              ...extraTaskData
+            })
+
+          callbackUpdater.fail = ({ outputData, reasonForIncompletion = '', ...extraTaskData }) =>
+            this.updateResult({
+              workflowInstanceId: data.workflowInstanceId,
+              taskId: data.taskId,
+              reasonForIncompletion,
+              status: TASK_STATUS.FAILED,
+              outputData,
+              ...extraTaskData
+            })
+          callbackUpdater.inprogress = ({
+            outputData,
+            reasonForIncompletion = '',
+            ...extraTaskData
+          }) =>
+            this.updateResult({
+              workflowInstanceId: data.workflowInstanceId,
+              taskId: data.taskId,
+              reasonForIncompletion,
+              status: TASK_STATUS.IN_PROGRESS,
+              outputData,
+              ...extraTaskData
+            })
+
+          await this.callback(data, callbackUpdater)
+        } catch (error) {
+          this.updateResult({
+            workflowInstanceId: data.workflowInstanceId,
+            taskId: data.taskId,
+            reasonForIncompletion: error.message,
+            status: TASK_STATUS.FAILED
+          })
+        } finally {
+          this.destroyTaskTimeout(data.taskId)
+          this.destroyTask(data.taskId)
         }
       }
     } catch (error) {
@@ -159,6 +157,8 @@ export default class Watcher {
     if (this.isPolling) throw new Error('Watcher is already started')
     this.isPolling = true
     this.startTime = new Date()
-    this.polling()
+    for (let i = 0; i < this.options.maxRunner; i++) {
+      this.polling(i)
+    }
   }
 }
