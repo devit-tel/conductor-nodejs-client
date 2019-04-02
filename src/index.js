@@ -104,12 +104,7 @@ export default class ConductorClient {
   registerWatcher = (taskType, callback = f => f, options = {}, startPolling = false) => {
     if (!taskType) throw new Error('Task type is required for registering watcher')
     if (this.tasks[taskType]) throw new Error(`Task "${taskType}" is already registered`)
-    this.tasks[taskType] = new Watcher(
-      taskType,
-      { ...this.options, ...options },
-      callback,
-      console.error
-    )
+    this.tasks[taskType] = new Watcher(taskType, { ...this.options, ...options }, callback)
     if (startPolling) this.tasks[taskType].startPolling()
     return this.tasks[taskType]
   }
