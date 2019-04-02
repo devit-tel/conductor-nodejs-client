@@ -118,7 +118,6 @@ export default class Watcher {
     try {
       const { baseURL, workerID } = this.options
       const freeRunnersCount = this.options.maxRunner - Object.keys(this.tasks).length
-      console.log(freeRunnersCount)
       if (freeRunnersCount > 0) {
         const rasp = await pollForTasks(baseURL, this.taskType, workerID, freeRunnersCount)
         const tasks = pathOr([], ['data'], rasp)
