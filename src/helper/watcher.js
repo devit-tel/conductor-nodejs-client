@@ -121,50 +121,55 @@ export default class Watcher {
       if (freeRunnersCount > 0) {
         const rasp = await pollForTasks(baseURL, this.taskType, workerID, freeRunnersCount)
         const tasks = pathOr([], ['data'], rasp)
-
-        for (const task of tasks) {
-          this.tasks[task.taskId] = task
-          if (this.options.autoAck === true) await this.ackTask(task.taskId)
-          if (task.responseTimeoutSeconds > 0) {
-            this.tasksTimeout[task.taskId] = setTimeout(() => {
-              this.destroyTask(task.taskId)
-              this.errorCallback(new Error(`Task "${task.taskId}" is not update in time`))
-            }, task.responseTimeoutSeconds * 1000)
-          }
-
-          const callbackUpdater = this.getUpdater(task)
-          try {
-            const cb = this.callback(task, callbackUpdater)
-            if (type(cb) === 'Promise') {
-              cb.then(() => {
-                this.destroyTaskTimeout(task.taskId)
-                this.destroyTask(task.taskId)
-              }).catch(error => {
-                this.updateResult({
-                  workflowInstanceId: task.workflowInstanceId,
-                  taskId: task.taskId,
-                  reasonForIncompletion: error.message,
-                  status: TASK_STATUS.FAILED
-                })
-              })
-            } else {
-              this.destroyTaskTimeout(task.taskId)
-              this.destroyTask(task.taskId)
-            }
-          } catch (error) {
-            this.updateResult({
-              workflowInstanceId: task.workflowInstanceId,
-              taskId: task.taskId,
-              reasonForIncompletion: error.message,
-              status: TASK_STATUS.FAILED
-            })
-          }
-        }
+        tasks.map(this.ackTaskThenCallback)
       }
     } catch (error) {
       this.errorCallback(error)
     } finally {
       setTimeout(this.polling, this.options.pollingIntervals - (new Date() - this.startTime))
+    }
+  }
+
+  ackTaskThenCallback = async task => {
+    this.tasks[task.taskId] = task
+    try {
+      if (this.options.autoAck === true) await this.ackTask(task.taskId)
+      if (task.responseTimeoutSeconds > 0) {
+        this.tasksTimeout[task.taskId] = setTimeout(() => {
+          this.destroyTask(task.taskId)
+          this.errorCallback(new Error(`Task "${task.taskId}" is not update in time`))
+        }, task.responseTimeoutSeconds * 1000)
+      }
+    } catch (error) {
+      // Handle ack error here
+    }
+
+    const callbackUpdater = this.getUpdater(task)
+    try {
+      const cb = this.callback(task, callbackUpdater)
+      if (type(cb) === 'Promise') {
+        cb.then(() => {
+          this.destroyTaskTimeout(task.taskId)
+          this.destroyTask(task.taskId)
+        }).catch(error => {
+          this.updateResult({
+            workflowInstanceId: task.workflowInstanceId,
+            taskId: task.taskId,
+            reasonForIncompletion: error.message,
+            status: TASK_STATUS.FAILED
+          })
+        })
+      } else {
+        this.destroyTaskTimeout(task.taskId)
+        this.destroyTask(task.taskId)
+      }
+    } catch (error) {
+      this.updateResult({
+        workflowInstanceId: task.workflowInstanceId,
+        taskId: task.taskId,
+        reasonForIncompletion: error.message,
+        status: TASK_STATUS.FAILED
+      })
     }
   }
 
