@@ -13,6 +13,7 @@ import {
   unRegisterTaskDef,
   startWorkflow,
   terminateWorkflow,
+  deleteWorkflowFromSystem,
   pauseWorkflow,
   resumeWorkflow,
   skipTaskFromWorkflow,
@@ -74,6 +75,9 @@ export default class ConductorClient {
 
   terminateWorkflow = (workflowId, reason = '') =>
     terminateWorkflow(this.options.baseURL, workflowId, reason)
+
+  deleteWorkflowFromSystem = workflowId =>
+    deleteWorkflowFromSystem(this.options.baseURL, workflowId)
 
   pauseWorkflow = workflowId => pauseWorkflow(this.options.baseURL, workflowId)
 

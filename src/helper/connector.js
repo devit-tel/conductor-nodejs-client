@@ -252,6 +252,14 @@ export function terminateWorkflow(baseURL, workflowId, reason) {
   })
 }
 
+export function deleteWorkflowFromSystem(baseURL, workflowId, reason) {
+  return HTTPClient({
+    method: 'delete',
+    baseURL,
+    url: `/workflow/${workflowId}/remove`
+  })
+}
+
 export function pauseWorkflow(baseURL, workflowId) {
   return HTTPClient({
     method: 'put',
