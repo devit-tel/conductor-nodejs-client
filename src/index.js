@@ -23,8 +23,7 @@ import {
   getRunningWorkflows,
   searchWorkflows,
   updateTask,
-  getTask,
-  getWorkflow
+  getTask
 } from './helper/connector'
 
 export const DEFAULT_OPTIONS = {
@@ -60,6 +59,10 @@ export default class ConductorClient {
   updateTaskDef = taskDefMeta => updateTaskDef(this.options.baseURL, taskDefMeta)
 
   unRegisterTaskDef = taskDefName => unRegisterTaskDef(this.options.baseURL, taskDefName)
+
+  updateTask = taskBody => updateTask(this.options.baseURL, taskBody)
+
+  getTask = taskID => getTask(this.options.baseURL, taskID)
 
   getWorkflow = (workflowId, includeTasks = true) =>
     getWorkflow(this.options.baseURL, workflowId, includeTasks)
@@ -104,13 +107,6 @@ export default class ConductorClient {
       reRunFromTaskId,
       taskInput
     })
-
-  updateTask = taskBody => updateTask(this.options.baseURL, taskBody)
-
-  getTask = taskID => getTask(this.options.baseURL, taskID)
-
-  getWorkflow = (workflowId, includeTasks = true) =>
-    getWorkflow(this.options.baseURL, workflowId, includeTasks)
 
   registerWatcher = (taskType, callback = f => f, options = {}, startPolling = false) => {
     if (!taskType) throw new Error('Task type is required for registering watcher')
