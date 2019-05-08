@@ -18,6 +18,7 @@ import {
   resumeWorkflow,
   skipTaskFromWorkflow,
   rerunWorkflow,
+  retryWorkflow,
   restartWorkflow,
   getWorkflow,
   getRunningWorkflows,
@@ -87,6 +88,8 @@ export default class ConductorClient {
   pauseWorkflow = workflowId => pauseWorkflow(this.options.baseURL, workflowId)
 
   resumeWorkflow = workflowId => resumeWorkflow(this.options.baseURL, workflowId)
+
+  retryWorkflow = workflowId => retryWorkflow(this.options.baseURL, workflowId)
 
   skipTaskFromWorkflow = (workflowId, taskReferenceName, taskInput, taskOutput) =>
     skipTaskFromWorkflow(this.options.baseURL, workflowId, taskReferenceName, {

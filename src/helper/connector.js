@@ -294,6 +294,14 @@ export function rerunWorkflow(baseURL, workflowId, rerunWorkflowRequest = {}) {
   })
 }
 
+export function retryWorkflow(baseURL, workflowId) {
+  return HTTPClient({
+    method: 'post',
+    baseURL,
+    url: `/workflow/${workflowId}/retry`
+  })
+}
+
 export function restartWorkflow(baseURL, workflowId) {
   return HTTPClient({
     method: 'post',
