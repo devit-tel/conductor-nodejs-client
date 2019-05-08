@@ -1,5 +1,4 @@
-import ConductorClient from './index.js'
-
+const ConductorClient = require('../build').default
 // registerWatcher('./src/helper/watcher', { baseURL: BASE_URL, taskType: 'get_money' })
 
 const conductorClient = new ConductorClient({ baseURL: 'http://localhost:8080/api' })
@@ -18,6 +17,7 @@ conductorClient.registerWatcher(
   (data, updater) => {
     console.log(data.taskType, data.inputData)
     updater({ status: 'COMPLETED' })
+    updater
   },
   { pollingIntervals: 1000, autoAck: true, maxRunner: 1 },
   true

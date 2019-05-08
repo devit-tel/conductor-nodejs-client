@@ -1,6 +1,6 @@
 import os from 'os'
 import { pathOr, type } from 'ramda'
-import { pollForTasks, ackTask, updateTask } from './connector'
+import { pollForTasks, ackTask, updateTask, TaskBody, TaskStatus, TaskData } from './connector'
 
 const DEFAULT_OPTIONS = {
   pollingIntervals: 1000,
@@ -10,18 +10,68 @@ const DEFAULT_OPTIONS = {
   workerID: os.hostname()
 }
 
-const TASK_STATUS = {
-  IN_PROGRESS: 'IN_PROGRESS',
-  FAILED: 'FAILED',
-  COMPLETED: 'COMPLETED'
+export type ConductorOption = {
+  baseURL: string
+  workerID: string
+  pollingIntervals: number
+  maxRunner: number
+  autoAck: boolean
 }
 
-export default class Watcher {
-  isPolling = false
-  tasks = {}
-  tasksTimeout = {}
+export type CallbackUpdater = {
+  (
+    {
+      status,
+      outputData,
+      reasonForIncompletion,
+      ...extraTaskData
+    }: {
+      [x: string]: any
+      status: any
+      outputData: any
+      reasonForIncompletion?: string
+    }
+  ): Promise<any>
+  complete({ outputData, ...extraTaskData }: { [x: string]: any; outputData: any }): Promise<any>
+  fail({
+    outputData,
+    reasonForIncompletion,
+    ...extraTaskData
+  }: {
+    [x: string]: any
+    outputData: any
+    reasonForIncompletion?: string
+  }): Promise<any>
+  inprogress({
+    outputData,
+    callbackAfterSeconds,
+    ...extraTaskData
+  }: {
+    [x: string]: any
+    outputData: any
+    callbackAfterSeconds?: number
+  }): Promise<any>
+}
 
-  constructor(taskType, options, callback, errorCallback = f => f) {
+export type CallbackFunction = (task: TaskData, callbackUpdater: CallbackUpdater) => any
+
+export default class Watcher {
+  private isPolling: boolean = false
+  private tasks: any = {}
+  private tasksTimeout: any = {}
+  private startTime: Date
+
+  private taskType: string
+  private options: ConductorOption
+  private callback: CallbackFunction
+  private errorCallback: Function
+
+  constructor(
+    taskType: string,
+    options: ConductorOption,
+    callback: CallbackFunction,
+    errorCallback: Function = f => f
+  ) {
     if (!callback) throw new Error('Callback function is required')
     this.taskType = taskType
     this.options = { ...DEFAULT_OPTIONS, ...options }
@@ -29,33 +79,19 @@ export default class Watcher {
     this.errorCallback = errorCallback
   }
 
-  destroyTaskTimeout = taskId => {
+  destroyTaskTimeout = (taskId: string) => {
     clearTimeout(this.tasksTimeout[taskId])
     delete this.tasks[taskId]
   }
 
-  destroyTask = taskId => delete this.tasks[taskId]
+  destroyTask = (taskId: string) => delete this.tasks[taskId]
 
-  ackTask = taskId => ackTask(this.options.baseURL, taskId, this.options.workerID)
+  ackTask = (taskId: string) => ackTask(this.options.baseURL, taskId, this.options.workerID)
 
-  updateResult = async ({
-    workflowInstanceId,
-    taskId,
-    reasonForIncompletion,
-    status,
-    outputData = {},
-    ...extraTaskData
-  }) => {
+  updateResult = async (taskBody: TaskBody) => {
     try {
-      const result = updateTask(this.options.baseURL, {
-        workflowInstanceId,
-        taskId,
-        reasonForIncompletion,
-        status,
-        outputData,
-        ...extraTaskData
-      })
-      // if ([TASK_STATUS.IN_PROGRESS, TASK_STATUS.FAILED, TASK_STATUS.COMPLETED].includes(status)) {
+      const result = await updateTask(this.options.baseURL, taskBody)
+      // if ([TaskStatus.IN_PROGRESS, TaskStatus.FAILED, TaskStatus.COMPLETED].includes(status)) {
       //   this.destroyTaskTimeout(taskId)
       //   this.destroyTask(taskId)
       // }
@@ -65,7 +101,7 @@ export default class Watcher {
     }
   }
 
-  getUpdater = task => {
+  getUpdater = (task: TaskData): CallbackUpdater => {
     const callbackUpdater = ({
       status,
       outputData,
@@ -86,7 +122,7 @@ export default class Watcher {
         workflowInstanceId: task.workflowInstanceId,
         taskId: task.taskId,
         reasonForIncompletion,
-        status: TASK_STATUS.COMPLETED,
+        status: TaskStatus.COMPLETED,
         outputData,
         ...extraTaskData
       })
@@ -96,7 +132,7 @@ export default class Watcher {
         workflowInstanceId: task.workflowInstanceId,
         taskId: task.taskId,
         reasonForIncompletion,
-        status: TASK_STATUS.FAILED,
+        status: TaskStatus.FAILED,
         outputData,
         ...extraTaskData
       })
@@ -105,7 +141,7 @@ export default class Watcher {
         workflowInstanceId: task.workflowInstanceId,
         taskId: task.taskId,
         reasonForIncompletion,
-        status: TASK_STATUS.IN_PROGRESS,
+        status: TaskStatus.IN_PROGRESS,
         outputData,
         ...extraTaskData
       })
@@ -126,7 +162,10 @@ export default class Watcher {
     } catch (error) {
       this.errorCallback(error)
     } finally {
-      setTimeout(this.polling, this.options.pollingIntervals - (new Date() - this.startTime))
+      setTimeout(
+        this.polling,
+        this.options.pollingIntervals - (new Date().getTime() - this.startTime.getTime())
+      )
     }
   }
 
@@ -156,7 +195,7 @@ export default class Watcher {
             workflowInstanceId: task.workflowInstanceId,
             taskId: task.taskId,
             reasonForIncompletion: error.message,
-            status: TASK_STATUS.FAILED
+            status: TaskStatus.FAILED
           })
         })
       } else {
@@ -168,7 +207,7 @@ export default class Watcher {
         workflowInstanceId: task.workflowInstanceId,
         taskId: task.taskId,
         reasonForIncompletion: error.message,
-        status: TASK_STATUS.FAILED
+        status: TaskStatus.FAILED
       })
     }
   }
