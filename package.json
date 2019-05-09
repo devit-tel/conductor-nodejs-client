@@ -1,6 +1,6 @@
 {
   "name": "conductor-client",
-  "version": "0.1.9",
+  "version": "1.0.0-beta.0",
   "description": "Conductor client for nodejs ",
   "main": "./build/index.js",
   "scripts": {
@@ -12,9 +12,9 @@
   "author": "Watchrapong Agsonchu",
   "license": "ISC",
   "dependencies": {
-    "@babel/runtime": "^7.2.0",
     "axios": "0.18.0",
-    "ramda": "0.26.1"
+    "ramda": "0.26.1",
+    "tslib": "^1.9.3"
   },
   "keywords": [
     "conductor",
