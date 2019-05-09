@@ -5,7 +5,6 @@
   "main": "./build/index.js",
   "scripts": {
     "clean": "rm -rf build && mkdir build",
-    "test": "nodemon src/test.js --exec babel-node -e js",
     "build": "npm run clean && tsc -p tsconfig.release.json",
     "prepublish": "npm run build"
   },
