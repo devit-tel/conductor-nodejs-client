@@ -117,11 +117,10 @@ export default class Watcher {
         ...extraTaskData
       })
 
-    callbackUpdater.complete = ({ outputData, reasonForIncompletion = '', ...extraTaskData }) =>
+    callbackUpdater.complete = ({ outputData, ...extraTaskData }) =>
       this.updateResult({
         workflowInstanceId: task.workflowInstanceId,
         taskId: task.taskId,
-        reasonForIncompletion,
         status: TaskStatus.COMPLETED,
         outputData,
         ...extraTaskData
@@ -136,13 +135,18 @@ export default class Watcher {
         outputData,
         ...extraTaskData
       })
-    callbackUpdater.inprogress = ({ outputData, reasonForIncompletion = '', ...extraTaskData }) =>
+
+    callbackUpdater.inprogress = ({
+      outputData,
+      callbackAfterSeconds = Number.MAX_SAFE_INTEGER,
+      ...extraTaskData
+    }) =>
       this.updateResult({
         workflowInstanceId: task.workflowInstanceId,
         taskId: task.taskId,
-        reasonForIncompletion,
         status: TaskStatus.IN_PROGRESS,
         outputData,
+        callbackAfterSeconds,
         ...extraTaskData
       })
     return callbackUpdater
