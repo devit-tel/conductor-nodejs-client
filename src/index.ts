@@ -109,10 +109,7 @@ export default class ConductorClient {
     taskInput: any,
     taskOutput: any
   ) =>
-    skipTaskFromWorkflow(this.options.baseURL, workflowId, taskReferenceName, {
-      taskInput,
-      taskOutput
-    })
+    skipTaskFromWorkflow(this.options.baseURL, workflowId, taskReferenceName, taskInput, taskOutput)
 
   rerunWorkflow = (
     workflowId: string,
