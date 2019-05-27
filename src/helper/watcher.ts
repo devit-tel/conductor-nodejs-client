@@ -178,10 +178,15 @@ export default class Watcher {
     try {
       if (this.options.autoAck === true) await this.ackTask(task.taskId)
       if (task.responseTimeoutSeconds > 0) {
-        this.tasksTimeout[task.taskId] = setTimeout(() => {
-          this.destroyTask(task.taskId)
-          this.errorCallback(new Error(`Task "${task.taskId}" is not update in time`))
-        }, task.responseTimeoutSeconds * 1000)
+        this.tasksTimeout[task.taskId] = setTimeout(
+          () => {
+            this.destroyTask(task.taskId)
+            this.errorCallback(new Error(`Task "${task.taskId}" is not update in time`))
+          },
+          task.responseTimeoutSeconds < Number.MAX_SAFE_INTEGER
+            ? task.responseTimeoutSeconds * 1000
+            : Number.MAX_SAFE_INTEGER
+        )
       }
     } catch (error) {
       // Handle ack error here
