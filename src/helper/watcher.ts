@@ -2,6 +2,8 @@ import * as os from 'os'
 import { pathOr, type } from 'ramda'
 import { pollForTasks, ackTask, updateTask, TaskBody, TaskStatus, TaskData } from './connector'
 
+const MAX_32_INT = 2147483647
+
 const DEFAULT_OPTIONS = {
   pollingIntervals: 1000,
   baseURL: 'http://localhost:8080/api',
@@ -177,16 +179,11 @@ export default class Watcher {
     this.tasks[task.taskId] = task
     try {
       if (this.options.autoAck === true) await this.ackTask(task.taskId)
-      if (task.responseTimeoutSeconds > 0) {
-        this.tasksTimeout[task.taskId] = setTimeout(
-          () => {
-            this.destroyTask(task.taskId)
-            this.errorCallback(new Error(`Task "${task.taskId}" is not update in time`))
-          },
-          task.responseTimeoutSeconds < Number.MAX_SAFE_INTEGER
-            ? task.responseTimeoutSeconds * 1000
-            : Number.MAX_SAFE_INTEGER
-        )
+      if (task.responseTimeoutSeconds > 0 && task.responseTimeoutSeconds <= MAX_32_INT) {
+        this.tasksTimeout[task.taskId] = setTimeout(() => {
+          this.destroyTask(task.taskId)
+          this.errorCallback(new Error(`Task "${task.taskId}" is not update in time`))
+        }, task.responseTimeoutSeconds)
       }
     } catch (error) {
       // Handle ack error here
