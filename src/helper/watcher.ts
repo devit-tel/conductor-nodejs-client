@@ -79,6 +79,7 @@ export default class Watcher {
     this.options = { ...DEFAULT_OPTIONS, ...options }
     this.callback = callback
     this.errorCallback = errorCallback
+    this.polling()
   }
 
   destroyTaskTimeout = (taskId: string) => {
@@ -154,16 +155,17 @@ export default class Watcher {
     return callbackUpdater
   }
 
-  // this should be private function
-  polling = async () => {
+  private polling = async () => {
     this.startTime = new Date()
     try {
-      const { baseURL, workerID } = this.options
-      const freeRunnersCount = this.options.maxRunner - Object.keys(this.tasks).length
-      if (freeRunnersCount > 0) {
-        const rasp = await pollForTasks(baseURL, this.taskType, workerID, freeRunnersCount)
-        const tasks = pathOr([], ['data'], rasp)
-        tasks.map(this.ackTaskThenCallback)
+      if (this.isPolling) {
+        const { baseURL, workerID } = this.options
+        const freeRunnersCount = this.options.maxRunner - Object.keys(this.tasks).length
+        if (freeRunnersCount > 0) {
+          const rasp = await pollForTasks(baseURL, this.taskType, workerID, freeRunnersCount)
+          const tasks = pathOr([], ['data'], rasp)
+          tasks.map(this.ackTaskThenCallback)
+        }
       }
     } catch (error) {
       this.errorCallback(error)
@@ -222,6 +224,9 @@ export default class Watcher {
     if (this.isPolling) throw new Error('Watcher is already started')
     this.isPolling = true
     this.startTime = new Date()
-    this.polling()
+  }
+
+  stopPolling = () => {
+    this.isPolling = false
   }
 }

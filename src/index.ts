@@ -143,4 +143,10 @@ export default class ConductorClient {
       if (this.tasks[taskType].isPolling === false) this.tasks[taskType].startPolling()
     }
   }
+
+  stopPolling = () => {
+    for (const taskType in this.tasks) {
+      if (this.tasks[taskType].isPolling === true) this.tasks[taskType].stopPolling()
+    }
+  }
 }
