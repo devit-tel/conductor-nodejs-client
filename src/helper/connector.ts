@@ -91,6 +91,7 @@ export type TaskData = {
   taskStatus: string
   queueWaitTime: number
   logs: [string]
+  'uber-trace-id': string
 }
 
 export const getWorkflowDefinition = (baseURL: string, workflowName: string, version: number = 1) =>

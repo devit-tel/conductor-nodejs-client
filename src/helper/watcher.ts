@@ -1,6 +1,10 @@
 import * as os from 'os'
-import { pathOr, type } from 'ramda'
+import { pathOr } from 'ramda'
 import { pollForTasks, ackTask, updateTask, TaskBody, TaskStatus, TaskData } from './connector'
+import jaegerClient from 'jaeger-client-utility'
+import { FORMAT_TEXT_MAP } from 'opentracing'
+
+jaegerClient.init({ serviceName: process.env.APP_NAME || 'unnamed-app' })
 
 const MAX_32_INT = 2147483647
 
@@ -104,7 +108,7 @@ export default class Watcher {
     }
   }
 
-  getUpdater = (task: TaskData): CallbackUpdater => {
+  getUpdater = (task: TaskData, initOutData: any): CallbackUpdater => {
     const callbackUpdater = ({
       status,
       outputData,
@@ -116,7 +120,7 @@ export default class Watcher {
         taskId: task.taskId,
         reasonForIncompletion,
         status,
-        outputData,
+        outputData: { ...initOutData, ...outputData },
         ...extraTaskData
       })
 
@@ -125,7 +129,7 @@ export default class Watcher {
         workflowInstanceId: task.workflowInstanceId,
         taskId: task.taskId,
         status: TaskStatus.COMPLETED,
-        outputData,
+        outputData: { ...initOutData, ...outputData },
         ...extraTaskData
       })
 
@@ -135,7 +139,7 @@ export default class Watcher {
         taskId: task.taskId,
         reasonForIncompletion,
         status: TaskStatus.FAILED,
-        outputData,
+        outputData: { ...initOutData, ...outputData },
         ...extraTaskData
       })
 
@@ -148,7 +152,7 @@ export default class Watcher {
         workflowInstanceId: task.workflowInstanceId,
         taskId: task.taskId,
         status: TaskStatus.IN_PROGRESS,
-        outputData,
+        outputData: { ...initOutData, ...outputData },
         callbackAfterSeconds,
         ...extraTaskData
       })
@@ -191,32 +195,26 @@ export default class Watcher {
       // Handle ack error here
     }
 
-    const callbackUpdater = this.getUpdater(task)
+    const parentSpan = jaegerClient.getParentSpan(FORMAT_TEXT_MAP, task.inputData)
+    const span = jaegerClient.startSpan(task.taskType, { childOf: parentSpan })
+    const jaegerTrace = {}
+    jaegerClient.inject(span, FORMAT_TEXT_MAP, jaegerTrace)
+    const callbackUpdater = this.getUpdater(task, jaegerTrace)
+
     try {
-      const cb = this.callback(task, callbackUpdater)
-      if (type(cb) === 'Promise') {
-        cb.then(() => {
-          this.destroyTaskTimeout(task.taskId)
-          this.destroyTask(task.taskId)
-        }).catch(error => {
-          this.updateResult({
-            workflowInstanceId: task.workflowInstanceId,
-            taskId: task.taskId,
-            reasonForIncompletion: error.message,
-            status: TaskStatus.FAILED
-          })
-        })
-      } else {
-        this.destroyTaskTimeout(task.taskId)
-        this.destroyTask(task.taskId)
-      }
+      await this.callback({ ...task, ...jaegerTrace }, callbackUpdater)
     } catch (error) {
+      span.setTag('ERROR', error)
       this.updateResult({
         workflowInstanceId: task.workflowInstanceId,
         taskId: task.taskId,
         reasonForIncompletion: error.message,
         status: TaskStatus.FAILED
       })
+    } finally {
+      span.finish()
+      this.destroyTaskTimeout(task.taskId)
+      this.destroyTask(task.taskId)
     }
   }
 
