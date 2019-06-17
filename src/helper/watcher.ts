@@ -200,6 +200,9 @@ export default class Watcher {
     const jaegerTrace = {}
     jaegerClient.inject(span, FORMAT_TEXT_MAP, jaegerTrace)
     const callbackUpdater = this.getUpdater(task, jaegerTrace)
+    if (!parentSpan._traceId && task.inputData.orderId) {
+      span.setTag('orderId', task.inputData.orderId)
+    }
 
     try {
       await this.callback({ ...task, ...jaegerTrace }, callbackUpdater)
