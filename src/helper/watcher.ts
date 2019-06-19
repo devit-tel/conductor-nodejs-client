@@ -207,7 +207,7 @@ export default class Watcher {
     try {
       await this.callback({ ...task, ...jaegerTrace }, callbackUpdater)
     } catch (error) {
-      span.setTag('ERROR', error)
+      span.setTag('ERROR', error instanceof Error ? error.toString() : error)
       this.updateResult({
         workflowInstanceId: task.workflowInstanceId,
         taskId: task.taskId,
