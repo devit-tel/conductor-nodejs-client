@@ -1,5 +1,5 @@
 import * as os from 'os'
-import { pathOr } from 'ramda'
+import { pathOr, pickBy } from 'ramda'
 import { pollForTasks, ackTask, updateTask, TaskBody, TaskStatus, TaskData } from './connector'
 import jaegerClient from 'jaeger-client-utility'
 import { FORMAT_TEXT_MAP } from 'opentracing'
@@ -197,7 +197,7 @@ export default class Watcher {
       // Handle ack error here
     }
 
-    const parentSpan = jaegerClient.getParentSpan(FORMAT_TEXT_MAP, task.inputData)
+    const parentSpan = jaegerClient.getParentSpan(FORMAT_TEXT_MAP, pickBy(f => f, task.inputData))
     const span = jaegerClient.startSpan(task.taskType, { childOf: parentSpan })
     const jaegerTrace = {}
     jaegerClient.inject(span, FORMAT_TEXT_MAP, jaegerTrace)
