@@ -185,6 +185,9 @@ export default class Watcher {
 
   ackTaskThenCallback = async task => {
     this.tasks[task.taskId] = task
+    const parentSpan = jaegerClient.getParentSpan(FORMAT_TEXT_MAP, pickBy(f => f, task.inputData))
+    const rootSpan = jaegerClient.startSpan('ack-task', { childOf: parentSpan })
+
     try {
       if (this.options.autoAck === true) await this.ackTask(task.taskId)
       if (task.responseTimeoutSeconds > 0 && task.responseTimeoutSeconds <= MAX_32_INT) {
@@ -194,23 +197,24 @@ export default class Watcher {
         }, task.responseTimeoutSeconds)
       }
     } catch (error) {
+      rootSpan.setTag(error, error.toString())
       // Handle ack error here
+    } finally {
+      rootSpan.setTag('orderId', task.inputData.orderId)
+      rootSpan.finish()
     }
-
-    const parentSpan = jaegerClient.getParentSpan(FORMAT_TEXT_MAP, pickBy(f => f, task.inputData))
     const span = jaegerClient.startSpan(task.taskType, { childOf: parentSpan })
     const jaegerTrace = {}
     jaegerClient.inject(span, FORMAT_TEXT_MAP, jaegerTrace)
     const callbackUpdater = this.getUpdater(task, jaegerTrace)
-    if (!parentSpan._traceId && task.inputData.orderId) {
-      span.setTag('workflowType', task.workflowType)
-      span.setTag('workflowInstanceId', task.workflowInstanceId)
-      span.setTag('taskId', task.taskId)
-      span.setTag('retryCount', task.retryCount)
-      span.setTag('pollCount', task.pollCount)
-      span.setTag('seq', task.seq)
-      span.setTag('orderId', task.inputData.orderId)
-    }
+
+    span.setTag('workflowType', task.workflowType)
+    span.setTag('workflowInstanceId', task.workflowInstanceId)
+    span.setTag('taskId', task.taskId)
+    span.setTag('retryCount', task.retryCount)
+    span.setTag('pollCount', task.pollCount)
+    span.setTag('seq', task.seq)
+    span.setTag('orderId', task.inputData.orderId)
 
     try {
       await this.callback({ ...task, ...jaegerTrace }, callbackUpdater)
