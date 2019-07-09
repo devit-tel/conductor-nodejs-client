@@ -187,6 +187,9 @@ export default class Watcher {
     this.tasks[task.taskId] = task
     const parentSpan = jaegerClient.getParentSpan(FORMAT_TEXT_MAP, pickBy(f => f, task.inputData))
     const rootSpan = jaegerClient.startSpan('ack-task', { childOf: parentSpan })
+    rootSpan.setTag('workflowType', task.workflowType)
+    rootSpan.setTag('workflowInstanceId', task.workflowInstanceId)
+    rootSpan.setTag('orderId', task.inputData.orderId)
 
     try {
       if (this.options.autoAck === true) await this.ackTask(task.taskId)
@@ -197,7 +200,8 @@ export default class Watcher {
         }, task.responseTimeoutSeconds)
       }
     } catch (error) {
-      rootSpan.setTag(error, error.toString())
+      rootSpan.setTag(error, true)
+      rootSpan.log({ error: error })
       // Handle ack error here
     } finally {
       rootSpan.setTag('orderId', task.inputData.orderId)
@@ -211,15 +215,14 @@ export default class Watcher {
     span.setTag('workflowType', task.workflowType)
     span.setTag('workflowInstanceId', task.workflowInstanceId)
     span.setTag('taskId', task.taskId)
-    span.setTag('retryCount', task.retryCount)
-    span.setTag('pollCount', task.pollCount)
-    span.setTag('seq', task.seq)
     span.setTag('orderId', task.inputData.orderId)
+    span.log(task)
 
     try {
       await this.callback({ ...task, ...jaegerTrace }, callbackUpdater)
     } catch (error) {
-      span.setTag('error', error instanceof Error ? error.toString() : error)
+      rootSpan.setTag(error, true)
+      rootSpan.log({ error: error })
       this.updateResult({
         workflowInstanceId: task.workflowInstanceId,
         taskId: task.taskId,
