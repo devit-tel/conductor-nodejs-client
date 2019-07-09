@@ -4,7 +4,9 @@ import { pollForTasks, ackTask, updateTask, TaskBody, TaskStatus, TaskData } fro
 import jaegerClient from 'jaeger-client-utility'
 import { FORMAT_TEXT_MAP } from 'opentracing'
 
-jaegerClient.init({ serviceName: process.env.APP_NAME || 'unnamed-app' })
+jaegerClient.init({
+  serviceName: process.env.APP_NAME || process.env.JAEGER_SERVICE_NAME || 'unnamed-app'
+})
 
 const MAX_32_INT = 2147483647
 
@@ -201,13 +203,19 @@ export default class Watcher {
     jaegerClient.inject(span, FORMAT_TEXT_MAP, jaegerTrace)
     const callbackUpdater = this.getUpdater(task, jaegerTrace)
     if (!parentSpan._traceId && task.inputData.orderId) {
+      span.setTag('workflowType', task.workflowType)
+      span.setTag('workflowInstanceId', task.workflowInstanceId)
+      span.setTag('taskId', task.taskId)
+      span.setTag('retryCount', task.retryCount)
+      span.setTag('pollCount', task.pollCount)
+      span.setTag('seq', task.seq)
       span.setTag('orderId', task.inputData.orderId)
     }
 
     try {
       await this.callback({ ...task, ...jaegerTrace }, callbackUpdater)
     } catch (error) {
-      span.setTag('ERROR', error instanceof Error ? error.toString() : error)
+      span.setTag('error', error instanceof Error ? error.toString() : error)
       this.updateResult({
         workflowInstanceId: task.workflowInstanceId,
         taskId: task.taskId,
