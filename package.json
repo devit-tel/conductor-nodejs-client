@@ -1,6 +1,6 @@
 {
   "name": "@sendit-th/conductor-client",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Conductor client for nodejs ",
   "main": "./build/index.js",
   "scripts": {
