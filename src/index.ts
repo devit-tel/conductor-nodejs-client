@@ -1,4 +1,5 @@
 import * as os from 'os'
+import * as R from 'ramda'
 import Watcher, { ConductorOption, CallbackFunction } from './helper/watcher'
 import {
   TaskBody,
@@ -124,6 +125,10 @@ export default class ConductorClient {
       reRunFromTaskId,
       taskInput
     })
+
+  getTasks = () => {
+    return R.map(task => task.getTasks(), this.tasks)
+  }
 
   registerWatcher = (
     taskType: string,

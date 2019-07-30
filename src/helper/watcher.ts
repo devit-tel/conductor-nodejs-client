@@ -88,6 +88,10 @@ export default class Watcher {
     this.polling()
   }
 
+  getTasks = () => {
+    return this.tasks
+  }
+
   destroyTaskTimeout = (taskId: string) => {
     clearTimeout(this.tasksTimeout[taskId])
     delete this.tasks[taskId]

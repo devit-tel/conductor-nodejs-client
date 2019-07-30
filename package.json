@@ -1,6 +1,6 @@
 {
   "name": "@sendit-th/conductor-client",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Conductor client for nodejs ",
   "main": "./build/index.js",
   "scripts": {
@@ -11,7 +11,8 @@
   "author": "Watchrapong Agsonchu",
   "license": "ISC",
   "dependencies": {
-    "axios": "0.18.0",
+    "@types/ramda": "^0.26.18",
+    "axios": "^0.19.0",
     "jaeger-client": "3.15.0",
     "jaeger-client-utility": "^1.0.1",
     "opentracing": "0.14.3",
