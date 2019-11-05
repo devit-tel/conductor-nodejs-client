@@ -174,16 +174,16 @@ export default class Watcher {
       if (this.isPolling) {
         const { baseURL, workerID } = this.options
         const freeRunnersCount = this.options.maxRunner - Object.keys(this.tasks).length
-        debug(`freeRunnersCount: ${freeRunnersCount} (${this.taskType})`)
+        // debug(`freeRunnersCount: ${freeRunnersCount} (${this.taskType})`)
         if (freeRunnersCount > 0) {
           const rasp = await pollForTasks(baseURL, this.taskType, workerID, freeRunnersCount)
           const tasks = pathOr([], ['data'], rasp)
-          debug(`Found ${tasks.length} tasks (${this.taskType})`)
+          // debug(`Found ${tasks.length} tasks (${this.taskType})`)
           tasks.map(this.ackTaskThenCallback)
         }
       }
     } catch (error) {
-      debug(error.toString() + this.taskType)
+      debug(`${error.toString()} ${this.taskType}`)
       this.errorCallback(error)
     } finally {
       setTimeout(
