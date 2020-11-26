@@ -16,6 +16,7 @@ export type ConductorOption = {
   pollingIntervals: number
   maxRunner: number
   autoAck: boolean
+  domain: string
 }
 
 export type CallbackUpdater = {
@@ -156,10 +157,10 @@ export default class Watcher {
   polling = async () => {
     this.startTime = new Date()
     try {
-      const { baseURL, workerID } = this.options
+      const { baseURL, workerID, domain } = this.options
       const freeRunnersCount = this.options.maxRunner - Object.keys(this.tasks).length
       if (freeRunnersCount > 0) {
-        const rasp = await pollForTasks(baseURL, this.taskType, workerID, freeRunnersCount)
+        const rasp = await pollForTasks(baseURL, this.taskType, workerID, freeRunnersCount, domain)
         const tasks = pathOr([], ['data'], rasp)
         tasks.map(this.ackTaskThenCallback)
       }

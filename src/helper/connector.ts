@@ -222,16 +222,21 @@ export function pollForTasks(
   baseURL: string,
   taskType: string,
   workerID: string,
-  count: number = 1
+  count: number = 1,
+  domain: string = undefined
 ) {
+  const params: any = {
+    workerid: workerID,
+    count
+  }
+  if (domain) {
+    params.domain = domain
+  }
   return HTTPClient({
     method: 'get',
     baseURL,
     url: `/tasks/poll/batch/${taskType}`,
-    params: {
-      workerid: workerID,
-      count
-    }
+    params
   })
 }
 
