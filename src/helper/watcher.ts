@@ -1,6 +1,6 @@
 import * as os from 'os'
-import { pathOr, type } from 'ramda'
-import { pollForTasks, ackTask, updateTask, TaskBody, TaskStatus, TaskData } from './connector'
+import { pathOr } from 'ramda'
+import { ackTask, pollForTasks, TaskBody, TaskData, TaskStatus, updateTask } from './connector'
 
 const DEFAULT_OPTIONS = {
   pollingIntervals: 1000,
@@ -190,23 +190,10 @@ export default class Watcher {
 
     const callbackUpdater = this.getUpdater(task)
     try {
-      const cb = this.callback(task, callbackUpdater)
-      if (type(cb) === 'Promise') {
-        cb.then(() => {
-          this.destroyTaskTimeout(task.taskId)
-          this.destroyTask(task.taskId)
-        }).catch(error => {
-          this.updateResult({
-            workflowInstanceId: task.workflowInstanceId,
-            taskId: task.taskId,
-            reasonForIncompletion: error.message,
-            status: TaskStatus.FAILED
-          })
-        })
-      } else {
-        this.destroyTaskTimeout(task.taskId)
-        this.destroyTask(task.taskId)
-      }
+      await this.callback(task, callbackUpdater)
+
+      this.destroyTaskTimeout(task.taskId)
+      this.destroyTask(task.taskId)
     } catch (error) {
       this.updateResult({
         workflowInstanceId: task.workflowInstanceId,
