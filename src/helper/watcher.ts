@@ -1,6 +1,6 @@
 import * as os from 'os'
-import { pathOr, type } from 'ramda'
-import { pollForTasks, ackTask, updateTask, TaskBody, TaskStatus, TaskData } from './connector'
+import { pathOr } from 'ramda'
+import { ackTask, pollForTasks, TaskBody, TaskData, TaskStatus, updateTask } from './connector'
 
 const DEFAULT_OPTIONS = {
   pollingIntervals: 1000,
@@ -16,6 +16,7 @@ export type ConductorOption = {
   pollingIntervals: number
   maxRunner: number
   autoAck: boolean
+  domain?: string
 }
 
 export type CallbackUpdater = {
@@ -156,10 +157,10 @@ export default class Watcher {
   polling = async () => {
     this.startTime = new Date()
     try {
-      const { baseURL, workerID } = this.options
+      const { baseURL, workerID, domain } = this.options
       const freeRunnersCount = this.options.maxRunner - Object.keys(this.tasks).length
       if (freeRunnersCount > 0) {
-        const rasp = await pollForTasks(baseURL, this.taskType, workerID, freeRunnersCount)
+        const rasp = await pollForTasks(baseURL, this.taskType, workerID, freeRunnersCount, domain)
         const tasks = pathOr([], ['data'], rasp)
         tasks.map(this.ackTaskThenCallback)
       }
@@ -189,23 +190,10 @@ export default class Watcher {
 
     const callbackUpdater = this.getUpdater(task)
     try {
-      const cb = this.callback(task, callbackUpdater)
-      if (type(cb) === 'Promise') {
-        cb.then(() => {
-          this.destroyTaskTimeout(task.taskId)
-          this.destroyTask(task.taskId)
-        }).catch(error => {
-          this.updateResult({
-            workflowInstanceId: task.workflowInstanceId,
-            taskId: task.taskId,
-            reasonForIncompletion: error.message,
-            status: TaskStatus.FAILED
-          })
-        })
-      } else {
-        this.destroyTaskTimeout(task.taskId)
-        this.destroyTask(task.taskId)
-      }
+      await this.callback(task, callbackUpdater)
+
+      this.destroyTaskTimeout(task.taskId)
+      this.destroyTask(task.taskId)
     } catch (error) {
       this.updateResult({
         workflowInstanceId: task.workflowInstanceId,
