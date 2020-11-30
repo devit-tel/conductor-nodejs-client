@@ -16,7 +16,7 @@ export type ConductorOption = {
   pollingIntervals: number
   maxRunner: number
   autoAck: boolean
-  domain: string
+  domain?: string
 }
 
 export type CallbackUpdater = {
