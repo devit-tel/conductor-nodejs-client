@@ -11,7 +11,7 @@
   "author": "Watchrapong Agsonchu",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "ramda": "^0.26.1",
     "tslib": "^1.9.3"
   },
